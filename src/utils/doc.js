@@ -1,5 +1,12 @@
 const DOC = {
-    mensaje: 'Hola GRUPO 6 desde Express CONECTADO A SQL SERVER',
+    mensaje: {
+      saludo: 'Hola Somos el GRUPO 6, este es nuestro Back end con Express CONECTADO A SQL SERVER',
+      integrantes: [
+        "Melgarejo Mónica",
+        "Nadine Nahuel Celeste",
+        "Ariel Wasserman"
+      ]
+    },
     uso: 'RUTAS HASTA EL MOMENTO',
     endpoints: {
       RAIZ : 'api/ -> la raiz con la documentación',
