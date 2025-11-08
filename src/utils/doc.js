@@ -7,14 +7,16 @@ const DOC = {
             'api/proyectos -> lista todas las proyectos',
             'api/contratos -> lista todos los contratos',
             'api/contratos_by_emailgerente -> body: {"emailGerente": "pepito@gmail.com"}',
-            'api/carreras -> lista todas las carreras'
+            'api/carreras -> lista todas las carreras',
+            'api/instituciones -> lista todas las instituciones educativas'
           ],
       POST: [
             'api/proyecto -> crea nuevo proyecto (body: nombre(obligatorio), description(obligatorio, true o false), info_link(opcional),buscando_devs(obligatorio),id_gerente(obligatorio), email_gerente(obligatorio))',
             `api/contrato -> crea un nuevo contrato (tipo: string, titulo: string, descripcion: string, tiene_postulaciones: bool 1 o 0,
               postulaciones: string, -- lista de emails separados por coma, esta_ocupado: booleano 1 o 0, pasante_email:string,
               projecto_id: string, start_date string, end_date string`,
-            'api/carrera -> crea una nueva carrera (nombre: string, info_link: string, status: string, id_institucion_educativa: string)'
+            'api/carrera -> crea una nueva carrera (nombre: string, info_link: string, status: string, id_institucion_educativa: string)',
+            'api/institucion -> crea una nueva institucion educativa (id: string, nombre: string, email: string,)'
       ]
     },
     ejemploPostProyecto: {
@@ -45,6 +47,20 @@ const DOC = {
     careerId: "7f2a9b1c-39f0-4a32-9d91-63d7f98bde52"
   }
 },
+
+ejemploPostInstitucion: {
+  POST: 'api/institucion-educativa',
+  body: {
+    id: "123e4567-e89b-12d3-a456-426614174000",  
+    nombre: "IFTS 11",
+    email: "IFTS11@gmail.com"
+  },
+  respuestaExito: {
+    message: "Institución educativa creada",
+    institucionId: "123e4567-e89b-12d3-a456-426614174000"
+  }
+},
+
     ejemploPostContrato: {
       POST: 'api/contrato',
       body: {
