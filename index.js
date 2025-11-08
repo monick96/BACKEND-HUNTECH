@@ -4,7 +4,7 @@ const serverless = require('serverless-http');
 const {PORT, HOSTNAME} = require('./src/utils/constants');
 
 const routerPrincipal = require('./src/routers/routerPrincipal');
-
+const routerCarrera = require('./src/routers/routerCarrera');
 
 
 const app = express();
@@ -14,6 +14,8 @@ app.use(express.json());
 //raiz
 app.use('/api', routerPrincipal);
 
+//carreras
+app.use('/api', routerCarrera);
 
 
 //inicia server y escucha solicitudes

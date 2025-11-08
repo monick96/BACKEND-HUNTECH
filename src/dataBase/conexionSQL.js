@@ -11,6 +11,7 @@ async function getPool() {
         // que viene del paquete mssql, es true o false
         if (poolDB && poolDB.connected) return poolDB;
 
+
         poolDB = await sql.connect(config);
 
         return poolDB;

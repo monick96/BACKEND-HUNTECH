@@ -7,6 +7,7 @@ const DOC = require('../utils/doc')
 //como exepcion solo aca voy a hacer req res y responder por el router por que es un archivo local
 // no le quiere hacer un repositorio, un service y controller -creo no vale la pena
 routerPrincipal.get('/',(req, res)=>{
+     
     res.status(200);
     res.json(DOC);
 })
