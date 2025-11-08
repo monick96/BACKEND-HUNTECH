@@ -8,7 +8,8 @@ const DOC = {
             'api/contratos -> lista todos los contratos',
             'api/contratos_by_emailgerente -> body: {"emailGerente": "pepito@gmail.com"}',
             'api/carreras -> lista todas las carreras',
-            'api/instituciones -> lista todas las instituciones educativas'
+            'api/instituciones -> lista todas las instituciones educativas',
+            'api/carreras_desarrollador -> lista todas las carreras por desarrollador'
           ],
       POST: [
             'api/proyecto -> crea nuevo proyecto (body: nombre(obligatorio), description(obligatorio, true o false), info_link(opcional),buscando_devs(obligatorio),id_gerente(obligatorio), email_gerente(obligatorio))',
@@ -16,7 +17,8 @@ const DOC = {
               postulaciones: string, -- lista de emails separados por coma, esta_ocupado: booleano 1 o 0, pasante_email:string,
               projecto_id: string, start_date string, end_date string`,
             'api/carrera -> crea una nueva carrera (nombre: string, info_link: string, status: string, id_institucion_educativa: string)',
-            'api/institucion -> crea una nueva institucion educativa (id: string, nombre: string, email: string,)'
+            'api/institucion -> crea una nueva institucion educativa (id: string, nombre: string, email: string,)',
+            'api/carrera_desarrollador -> crea una nueva carrera por desarrollador (id_desarrollador: string, id_carrera: string, start_date: string, end_date: string, isvalidated: boolean)'
       ]
     },
     ejemploPostProyecto: {
@@ -45,6 +47,20 @@ const DOC = {
   respuestaExito: { 
     message: "Carrera creada", 
     careerId: "7f2a9b1c-39f0-4a32-9d91-63d7f98bde52"
+  }
+},
+ejemploPostCareerDev: {
+  POST: 'api/carreras_desarrollador',
+  body: {
+    id_desarrollador: "DEV01",
+    id_carrera: "CARRERA100",
+    start_date: "05-03-2025",
+    end_date: "09-11-2029",
+    isvalidated: true
+  },
+  respuestaExito: { 
+    message: "Carrera por desarrollador creada", 
+    careerDevId: "a1b2c3d4-5678"
   }
 },
 
