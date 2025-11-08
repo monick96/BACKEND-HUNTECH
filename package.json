@@ -21,7 +21,6 @@
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "mssql": "^12.1.0",
-    "serverless-http": "^4.0.0",
     "sql-cli": "^0.6.2"
   },
   "devDependencies": {
