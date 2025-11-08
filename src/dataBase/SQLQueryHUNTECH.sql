@@ -1,12 +1,4 @@
-USE apphuntechdb;
-
-CREATE TABLE usuario (
-  id INT IDENTITY(1,1) PRIMARY KEY,
-  email VARCHAR(100),
-  descripcion VARCHAR(MAX),
-  username VARCHAR(100),
-  password VARCHAR(100)
-);
+CREATE DATABASE huntechdb;
 
 CREATE TABLE desarrollador (
   id VARCHAR(60),
@@ -75,6 +67,8 @@ CREATE TABLE contrato (
   start_date VARCHAR(100),
   end_date VARCHAR(100),
 );
+
+USE huntechdb;
 
 
 

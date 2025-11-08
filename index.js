@@ -26,7 +26,7 @@ app.use('/api', routerCareerDev);
 
 //inicia server y escucha solicitudes
 //3 parametros=> puerto, hostname, callback
-app.listen(PORT,HOSTNAME, () =>console.log(`El servidor esta corriendo en http://${HOSTNAME}:${PORT}`));
+app.listen(PORT,HOSTNAME, () =>console.log(`El servidor esta corriendo en http://${HOSTNAME}:${PORT}/api`));
 
 /* -------  para el LAMBDA  ------- */
 module.exports.handler = serverless(app);

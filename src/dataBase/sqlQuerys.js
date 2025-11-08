@@ -1,4 +1,4 @@
-//para las querys tipo:
+//para las querys tipo://al final no lo usamos
 
 const QUERYS = {
     GET_ALL_PROYECTOS: `SELECT * FROM proyecto`,
