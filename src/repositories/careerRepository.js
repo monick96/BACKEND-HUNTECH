@@ -5,10 +5,10 @@ const crypto = require('crypto');
 exports.getAllCareersRepository = async () => {
     try {
 
-       
+        //dos metodos async
         let dbPool = await getPool();
         
-        
+        //las querys deberian ir en sqlQuery
         const result = await dbPool.request().query(
             `SELECT *
         FROM   carrera
@@ -21,37 +21,39 @@ exports.getAllCareersRepository = async () => {
 
         console.error('REPOSITORY - Error al obtener carreras: ' + error);
 
-        throw Error('Error al obtener Carreras: ' + error.message);
+        throw Error('Error al obtener carrera: ' + error.message);
     }
     
 }
 
-exports.createCareerRepository = async (Career) => {
+exports.createCareerRepository = async (career) => {
     try {
 
-        const dbPool = await getPool();
+        dbPool = await getPool();
+
+        let id = crypto.randomUUID();//id random con libreria incluida een node
 
         const query = `
             INSERT INTO 
-            dbo.carrera ( nombre, info_link, status, id_institucion_educativa)
+            dbo.carrera (nombre, info_link, status, id_institucion_educativa)
             VALUES (
                 @nombre, 
                 @info_link, 
                 @status, 
                 @id_institucion_educativa
-            ); 
-            SELECT SCOPE_IDENTITY() AS id;
+            )
         `;
 
-        const result = await dbPool.request()
-            .input('nombre', Career.nombre)
-            .input('info_link', Career.info_link || '')
-            .input('status', Career.status || 'activo')
-            .input('id_institucion_educativa', Career.id_institucion_educativa)
+        await dbPool.request()
+            .input('nombre', career.nombre)
+            .input('id_institucion_educativa', career.id_institucion_educativa)
+            .input('info_link', career.info_link || '')
+            .input('status', career.status || 1)
+
             .query(query);
-
-        return result.recordset[0].id;
-
+            
+        return id;
+        
     } catch (error) {
 
         console.error('REPOSITORY - Error al crear carrera: ' + error.message);
@@ -60,4 +62,3 @@ exports.createCareerRepository = async (Career) => {
     }
     
 }
-
