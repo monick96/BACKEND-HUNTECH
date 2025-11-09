@@ -59,6 +59,12 @@ exports.createCareerRepository = async (career) => {
         console.error('REPOSITORY - Error al crear carrera: ' + error.message);
 
         throw Error('Error al crear carrera: ' + error.message);
-    }
     
+  }
+   finally {
+        
+        dbPool.close(); // cerrar conexion al terminar la operacion
+
+    } 
+
 }
