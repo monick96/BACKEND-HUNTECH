@@ -1,5 +1,5 @@
 const projectService = require('../services/projectService');
-// Express ya establece el Content-Type: application/json(lo que tenemos en constants.js) con res.json()
+// Express ya establece el Content-Type: application/json con res.json()
 //CAPA CONTROLLER: recibe la peticion del router ,
 //envia al servicio correspondiente y retorna respuesta(maneja los res y req)-- expone la funcionalidad
 
