@@ -27,3 +27,18 @@ exports.createProject = async (project) => {
     }
     
 }
+
+exports.getAllProjects = async () => {
+
+    try {
+
+        return await projectRepository.getAllProjectsRepository();
+        
+    } catch (error) {
+
+        console.error('SERVICE - Error al obtener proyectos: ' + error);
+
+        throw Error(error.message);
+    }
+    
+}

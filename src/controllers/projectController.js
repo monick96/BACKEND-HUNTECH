@@ -4,7 +4,6 @@ const projectService = require('../services/projectService');
 //envia al servicio correspondiente y retorna respuesta(maneja los res y req)-- expone la funcionalidad
 
 // funcion flecha asincronica por expresion
-// funcion flecha asicronica por expresion
 exports.createproject = async(req, res)=>{
     try {
 
@@ -23,5 +22,29 @@ exports.createproject = async(req, res)=>{
         res.status(500)
 
         res.json({ error: 'Error al crear proyectos: '+ error.message });
+    }
+}
+
+// funcion flecha asincronica por expresion
+exports.readprojects = async(req, res)=>{
+    try {
+
+        result = await projectService.getAllProjects();
+
+        res.status(200);
+
+        res.json({ 
+            message: 'proyectos obtenidos correctamente', 
+            count: result.length, 
+            data: result 
+        });
+        
+    } catch (error) {
+
+        console.error('Error al obtener proyectos: ' + error);
+
+        res.status(500)
+
+        res.json({ error: 'Error al obtener proyectos: '+ error.message });
     }
 }

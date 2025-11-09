@@ -14,7 +14,7 @@ exports.createProyectRepository = async (project) => {
 
         const query = `
             INSERT INTO 
-            dbo.proyecto (id, nombre, description, info_link, 
+            proyecto (id, nombre, description, info_link, 
             buscando_devs, id_gerente, email_gerente)
             VALUES (
                 @id, 
@@ -49,6 +49,40 @@ exports.createProyectRepository = async (project) => {
         console.error('REPOSITORY - Error al crear proyecto: ' + error.message);
 
         throw Error(error.message);
-    }
+
+    } finally {  
+
+        dbPool.close(); // cerrar conexion al terminar la operacion
+
+    } 
     
+}
+
+exports.getAllProjectsRepository = async () => {
+    try {
+
+        //dos metodos async: esperar al get pool y a la  respuesta de la query
+        let dbPool = await getPool();
+        
+        //las querys deberian ir en sqlQuery
+        const result = await dbPool.request().query(
+            `SELECT *
+        FROM   proyecto
+        `
+        );
+        
+        return result.recordset;
+
+    } catch (error) {
+
+        console.error('REPOSITORY - Error al obtener proyectos: ' + error);
+
+        throw Error('Error al obtener Proyectos: ' + error.message);
+
+    } finally {
+        
+        dbPool.close(); // cerrar conexion al terminar la operacion
+
+    } 
+
 }
