@@ -53,7 +53,7 @@ exports.createProyectRepository = async (project) => {
     } finally {  
 
         dbPool.close(); // cerrar conexion al terminar la operacion
-        
+
     } 
     
 }
@@ -85,5 +85,4 @@ exports.getAllProjectsRepository = async () => {
 
     } 
 
-    
 }
