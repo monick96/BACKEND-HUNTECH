@@ -1,6 +1,13 @@
 const DOC = {
-    mensaje: 'Hola GRUPO 6 desde Express + serverless-http en AWS LAMBDA CONECTADO A SQL SERVER👋',
-    uso: 'RUTAS HASTA EL MOMENTO - Son los métodos de Mati adaptados a express ',
+    mensaje: {
+      saludo: 'Hola Somos el GRUPO 6, este es nuestro Back end con Express CONECTADO A SQL SERVER',
+      integrantes: [
+        "Melgarejo Mónica",
+        "Nadine Nahuel Celeste",
+        "Ariel Wasserman"
+      ]
+    },
+    uso: 'RUTAS HASTA EL MOMENTO',
     endpoints: {
       RAIZ : 'api/ -> la raiz con la documentación',
       GET: [
@@ -36,7 +43,7 @@ const DOC = {
         proyectId: "10486a57-9717-4903-b402-199356b7ce7b" 
       }
     },
-   ejemploPostCarrera: {
+  ejemploPostCarrera: {
   POST: 'api/carrera',
   body: {
     nombre: "Ingeniería en Software",
