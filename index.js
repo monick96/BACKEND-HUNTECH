@@ -1,6 +1,5 @@
 
 const express = require('express');
-const serverless = require('serverless-http');
 const {PORT, HOSTNAME} = require('./src/utils/constants');
 
 const routerPrincipal = require('./src/routers/routerPrincipal');
