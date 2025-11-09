@@ -52,3 +52,27 @@ exports.createProyectRepository = async (project) => {
     }
     
 }
+
+exports.getAllProjectsRepository = async () => {
+    try {
+
+        //dos metodos async: esperar al get pool y a la  respuesta de la query
+        let dbPool = await getPool();
+        
+        //las querys deberian ir en sqlQuery
+        const result = await dbPool.request().query(
+            `SELECT *
+        FROM   proyecto
+        `
+        );
+        
+        return result;
+
+    } catch (error) {
+
+        console.error('REPOSITORY - Error al obtener proyectos: ' + error);
+
+        throw Error('Error al obtener Proyectos: ' + error.message);
+    }
+    
+}
