@@ -1,5 +1,9 @@
 const getPool = require("../dataBase/conexionSQL");
 const crypto = require('crypto');
+//CAPA REPOSITORY : metodos de CRUD a la DB
+//usamos return para enviar resultado a service y 
+// throw error para propagar el error y que lo tome el service,
+// y finalmente lo retorne controller
 
 exports.createProyectRepository = async (project) => {
     try {
@@ -44,7 +48,7 @@ exports.createProyectRepository = async (project) => {
 
         console.error('REPOSITORY - Error al crear proyecto: ' + error.message);
 
-        throw Error('Error al crear proyecto: ' + error.message);
+        throw Error(error.message);
     }
     
 }
