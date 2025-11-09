@@ -10,5 +10,6 @@ const projectController = require('../controllers/projectController')
 //  e injectado en el metodo correspondiente
 
 routerProyecto.post('/proyecto',projectController.createproject);
+routerProyecto.get('/proyectos',projectController.readprojects);
 
 module.exports = routerProyecto; 

@@ -71,7 +71,7 @@ exports.getAllProjectsRepository = async () => {
         `
         );
         
-        return result;
+        return result.recordset;
 
     } catch (error) {
 
