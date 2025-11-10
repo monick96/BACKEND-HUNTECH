@@ -1,0 +1,29 @@
+{
+  "name": "backend-huntech",
+  "version": "1.0.0",
+  "description": "Proyecto académico para la materia Desarrollo de Sistemas Web (Back End) - 2do año 2do cuatrimestre",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/monick96/BACKEND-HUNTECH.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/monick96/BACKEND-HUNTECH/issues"
+  },
+  "homepage": "https://github.com/monick96/BACKEND-HUNTECH#readme",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "mssql": "^12.1.0",
+    "sql-cli": "^0.6.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
