@@ -99,7 +99,7 @@ exports.updateProjectRepository = async (email_gerente, projectUpdated) => {
     if (id_gerente != null) requestUpdated.input("id_gerente", sql.VarChar, id_gerente);
     //if (email_gerente != null) requestUpdated.input("email_gerente", sql.VarChar, email_gerente);
     
-    let queryActualizada = "UPDATE proyecto SET ";
+    let queryActualizada = "UPDATE dbo.proyecto SET ";
     if (nombre != null) queryActualizada += "nombre = @nombre, ";
     if (description != null) queryActualizada += "description = @description, ";
     if (info_link != null) queryActualizada += "info_link = @info_link, ";
@@ -113,20 +113,21 @@ exports.updateProjectRepository = async (email_gerente, projectUpdated) => {
     queryActualizada += " OUTPUT INSERTED.* WHERE email_gerente = @email_gerente";
     
     //console.log(requestUpdated)
-    console.log(queryActualizada)
+    //console.log(queryActualizada)
 
-    const proyectoActualizado = await requestUpdated.query(queryActualizada);
+    let proyectoActualizado = await requestUpdated.query(queryActualizada);
     
     console.log(proyectoActualizado)
+    return proyectoActualizado.recordset[0];
 
-    if (proyectoActualizado.rowsAffected[0] == 0) {
+    /*if (proyectoActualizado.rowsAffected[0] == 0) {
             return null
         } else {
             return { nombre, description, info_link, buscando_devs, contratos, id_gerente }
-        }
+    }*/
   } catch (error) {
     console.log(
-      `Error en SQL REPOSITORY - updateProjectRepository - ${error}`
+     `Error en SQL REPOSITORY - updateProjectRepository - ${error}`
     );
     throw error;
   } finally {

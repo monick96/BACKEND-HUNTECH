@@ -40,19 +40,26 @@ exports.updateProject = async (req, res) => {
     const projectUpdated = req.body;
     const emailGerente = req.params.emailGerente;
     const project = await projectService.updateProject(emailGerente, projectUpdated);
-    console.log(project)
-    if (project.length === 0) {
+    //console.log(project)
+
+    if (project == null) {
       return res
         .status(404)
         .send(`No se encuentra un proyecto a modificar con el emailGerente: ${emailGerente}`);
     }
 
-    res.setHeader(CONTENT_TYPE, TYPE_JSON);
-    res.status(200).send(JSON.stringify(project));
+    
+    res.status(200)
+
+    res.json({
+      message: "proyectos actualizado",
+      data: project,
+    });
+
   } catch (error) {
     res.status(500).send({
       code: 500,
-      //message: "Error al actualizar el proyecto: ", projectUpdated //error.message,
+      message: "Error al actualizar el proyecto: " + /*projectUpdated*/ error.message,
     });
     throw Error("ERROR 500");
   }
