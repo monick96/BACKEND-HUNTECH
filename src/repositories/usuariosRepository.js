@@ -63,8 +63,6 @@ exports.chequearSiExisteUsuarioConEmailRetornarNombreTabla = async (email) => {
       .request()
       .input("email", email)
       .query(query);
-
-      console.log(result);
       
     //recosrset array objetos 
     if (result.recordset.length > 0) {
