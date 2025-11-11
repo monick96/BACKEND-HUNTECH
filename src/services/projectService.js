@@ -36,6 +36,20 @@ exports.createProject = async (project) => {
 
 }
 
+exports.chequearSiExisteProyectoConEmail = async (proyecto) => {
+  //console.log('SERVICE proyecto: ', proyecto)
+  try {
+    if (!proyecto.email_gerente) {
+      throw Error("Se debe indicar el email del gerente asociado al proyecto a buscar");
+    }
+    return await projectRepository.chequearSiExisteProyectoConEmail(proyecto)
+  } catch (error) {
+    console.error("SERVICE - Error al chequear si existe proyecto: " + error);
+    throw Error("Error al chequear si existe proyecto: " + error.message);
+  }
+};
+
+
 exports.getAllProjects = async () => {
 
     try {

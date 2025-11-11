@@ -7,6 +7,13 @@ const projectService = require("../services/projectService");
 exports.createproject = async (req, res) => {
   try {
     let project = req.body;
+
+    const elGerenteYaTieneProyecto = await projectService.chequearSiExisteProyectoConEmail(project)
+
+    if (elGerenteYaTieneProyecto == 1) {
+      return res.status(400).json({ message: 'El gerente ya tiene un proyecto. Cada gerente puede poseer solo un proyecto' });
+    }
+
     //retorna id del projecto creado o error
     result = await projectService.createProject(project);
     res.status(201);
