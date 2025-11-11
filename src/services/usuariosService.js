@@ -74,3 +74,20 @@ exports.createDesarrollador = async (desarrollador) => {
     throw Error("Error al crear desarrollador: " + error.message);
   }
 };
+
+exports.updateDesarrolladorByEmail = async (email, desarrollador) => {
+  try {
+
+    if (!email) {
+      throw Error("Se debe indicar el email del desarrollador");
+    }
+
+    return await usuariosRepository.updateDesarrolladorByEmailRepository(email, desarrollador);
+
+  } catch (error) {
+
+    console.error("SERVICE - Error al actualizar desarrollador: " + error);
+
+    throw Error(error.message);
+  }
+};

@@ -8,5 +8,6 @@ routerUsuario.get('/gerentebyemail', usuarioController.readGerenteByEmail)
 routerUsuario.post('/gerente', usuarioController.createGerente) 
 routerUsuario.delete('/gerente', usuarioController.deleteGerente)
 routerUsuario.post('/desarrollador', usuarioController.createDesarrollador)
+routerUsuario.put('/desarrolladorByEmail/:email', usuarioController.updateDesarrolladorByEmail)
 
 module.exports = routerUsuario;

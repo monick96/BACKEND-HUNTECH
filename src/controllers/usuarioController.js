@@ -115,3 +115,21 @@ exports.createDesarrollador = async(req, res)=>{
         res.json({ error: 'Error al crear desarrollador: '+ error.message });
     }
 }
+
+exports.updateDesarrolladorByEmail = async(req, res)=>{
+    try {
+        let {email} = req.params;
+        let {desarrollador} = req.body;
+
+        let result = await usuariosService.updateDesarrolladorByEmail(email,desarrollador);
+
+        res.status(200);       
+        res.json({ message: 'desarrollador actualizado', data:result });   
+    
+    }  
+    catch (error) {
+        console.error('Error al actualizar desarrollador: ' + error);
+        res.status(500)
+        res.json({ error: 'Error al actualizar desarrollador: '+ error.message });
+    }
+}

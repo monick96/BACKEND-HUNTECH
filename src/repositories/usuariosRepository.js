@@ -3,6 +3,8 @@ ni se va a crear nada llamado usuarios. Pero en términos conceptuales (o en POO
 desarrolladores, gerentes, e instituciones educativas. la idea es que este flujo se encargue del CRUD de los 3 */
 
 const getPool = require("../dataBase/conexionSQL");
+const sql = require('mssql');
+const crypto = require('crypto');
 
 /* ############# USUARIOS ############# */
 
@@ -159,3 +161,57 @@ exports.createDesarrolladorRepository = async (desarrollador) => {
 
   } 
 };
+
+//actualiza desarrollador por email y retorna todo el objeto actualizado
+exports.updateDesarrolladorByEmailRepository = async (email, desarrollador) => {
+  try {
+    let {nombre, descripcion, skills} = desarrollador;
+
+    dbPool = await getPool();
+    
+    let request = dbPool.request().input('email', sql.VarChar, email);
+
+    if (nombre != null) {request.input('nombre', sql.VarChar, nombre); } 
+    if (descripcion != null) {request.input('descripcion', sql.VarChar, descripcion); }
+  
+    let query = `UPDATE dbo.desarrollador SET `;
+    if (nombre != null) { query += `nombre = @nombre, `; }
+    
+    if (skills != null) {
+      const skillsStr = Array.isArray(skills) ? skills.join(',') : skills;
+      request.input('skills', sql.VarChar, skillsStr);
+      query += `skills = @skills, `;
+    }
+    
+    if (descripcion != null) { query += `descripcion = @descripcion, `; } 
+
+    query = query.trim().replace(/,$/, "")
+    query += ' OUTPUT INSERTED.* ';
+    query += ' WHERE email = @email'
+              
+        
+    let result = await request.query(query);
+
+    /*let updatedFields= [];
+
+    for (let name in request.parameters)
+    {
+        if (name != "id")updatedFields.push(name)
+    };*/
+
+    //return updatedFields; //ahora devuelve los campos que se actualizaron
+
+    return result;
+
+  } catch (error) {
+
+    console.error("REPOSITORY - Error al actualiza desarrollador: " + error.message);
+    throw Error("Error al actualizar desarrollador: " + error.message);
+
+  }finally{
+
+    dbPool.close();
+
+  }
+};
+
