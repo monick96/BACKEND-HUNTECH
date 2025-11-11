@@ -213,11 +213,61 @@ exports.deleteGerenteRepository = async (gerente) => {
 };
 
 /* ############# DESARROLLADORES ############# */
-///por cuestiones de tiempo solo voy a crear con campos basicos
-exports.createDesarrolladorRepository = async (desarrollador) => {
 
-  let dbPool = await getPool();//esto aca aveces rompe el metodo??
-  //si, por que el scope es el try, si esta dentro dell try, no alcanza al finally
+exports.getAllDesarrolladoresRepository = async () => {
+  let dbPool = await getPool();
+
+  try {
+    const result = await dbPool.request().query(`
+            SELECT
+                *
+            FROM
+                desarrollador
+            `);
+    return result.recordset;
+
+  } catch (error) {
+    console.error("REPOSITORY - Error al obtener desarrolladores: " + error);
+    throw Error(error.message);
+  }finally {
+    dbPool.close(); // cerrar conexion al terminar la operacion
+  } 
+};
+
+exports.getDesarrolladorByEmailRepository = async (desarrollador) => {
+
+  let dbPool = await getPool();
+  try {
+    const query = `
+            SELECT
+                *
+            FROM
+                desarrollador
+            WHERE
+                desarrollador.email = @email
+            `;
+    const result = await dbPool
+      .request()
+      .input("email", sql.VarChar, desarrollador.email)
+      .query(query);
+    return result.recordset;
+  } catch (error) {
+
+    console.error(
+      "REPOSITORY - Error al obtener el desarrollador solicitado: " + error
+    );
+    throw Error(error.message);
+
+  }finally {
+        
+    dbPool.close(); // cerrar conexion al terminar la operacion
+
+  } 
+};
+
+
+exports.createDesarrolladorRepository = async (desarrollador) => {
+  let dbPool = await getPool();
 
   try {
 
@@ -234,7 +284,9 @@ exports.createDesarrolladorRepository = async (desarrollador) => {
       .input("email", sql.VarChar, desarrollador.email)
       .input("id", sql.VarChar, id)
       .input("nombre",  sql.VarChar,desarrollador.nombre || "")
+      .input("apellido", sql.VarChar, desarrollador.apellido || "")
       .input("descripcion",  sql.VarChar, desarrollador.descripcion || "")
+      .input("fecha_nacimiento",  sql.VarChar, desarrollador.fecha_nacimiento || "")
       .query(query);
 
     return desarrollador.email;
@@ -248,6 +300,27 @@ exports.createDesarrolladorRepository = async (desarrollador) => {
         
     dbPool.close(); // cerrar conexion al terminar la operacion
 
+  } 
+};
+
+exports.deleteDesarrolladorRepository = async (desarrollador) => {
+  let dbPool = await getPool();
+  try {
+    const query = `
+            DELETE
+            FROM
+                desarrollador
+            WHERE
+                desarrollador.email = @email
+        `;
+    await dbPool.request().input("email",  sql.VarChar, desarrollador.email).query(query);
+
+    return desarrollador.email;
+  } catch (error) {
+    console.error("REPOSITORY - Error al eliminar desarrollador: " + error.message);
+    throw Error(error.message);
+  }finally {
+    dbPool.close(); // cerrar conexion al terminar la operacion
   } 
 };
 

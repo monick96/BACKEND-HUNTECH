@@ -78,6 +78,28 @@ exports.deleteGerente = async (gerente) => {
 };
 
 /* ############# DESARROLLADORES ############# */
+
+exports.getAllDesarrolladores = async () => {
+  try {
+    return await usuariosRepository.getAllDesarrolladoresRepository();
+  } catch (error) {
+    console.error("SERVICE - Error al obtener desarrolladores: " + error);
+    throw Error("Error al obtener desarrolladores: " + error.message);
+  }
+};
+
+exports.getDesarrolladorByEmail = async (desarrollador) => {
+  try {
+    if (!desarrollador.email) {
+      throw Error("Se debe indicar el email del desarrollador a buscar");
+    }
+    return await usuariosRepository.getDesarrolladorByEmailRepository(desarrollador);
+  } catch (error) {
+    console.error("SERVICE - Error al buscar ese desarrollador: " + error);
+    throw Error("Error al buscar ese desarrollador: " + error.message);
+  }
+};
+
 exports.createDesarrollador = async (desarrollador) => {
   try {
     if (!desarrollador.email) {
@@ -104,6 +126,18 @@ exports.updateDesarrolladorByEmail = async (email, desarrollador) => {
     console.error("SERVICE - Error al actualizar desarrollador: " + error);
 
     throw Error(error.message);
+  }
+};
+
+exports.deleteDesarrollador = async (desarrollador) => {
+  try {
+    if (!desarrollador.email) {
+      throw Error("Se debe indicar el email del desarrollador a eliminar");
+    }
+    return await usuariosRepository.deleteDesarrolladorRepository(desarrollador);
+  } catch (error) {
+    console.error("SERVICE - Error al eliminar desarrollador: " + error);
+    throw Error("Error al eliminar desarrollador: " + error.message);
   }
 };
 
