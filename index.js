@@ -7,10 +7,12 @@ const routerCarrera = require('./src/routers/routerCarrera');
 const routerCareerDev = require('./src/routers/routerCarrerDev');
 const routerProyecto = require('./src/routers/routerProyecto');
 const routerUsuario = require('./src/routers/routerUsuario');
+const routerContrato = require('./src/routers/routerContrato');
 
 const app = express();
 const cors = require('cors');
 app.use(express.json());
+
 app.use(cors({
     origin: 'http://localhost:4200' 
 }));
@@ -27,6 +29,9 @@ app.use('/api', routerCareerDev);
 
 //proyectos(todos los paths)
 app.use('/api', routerProyecto);
+
+//ruta contrato 
+app.use('/api', routerContrato);
 
 //usuarios (todos los paths: atención esta ruta manejará gerentes y desarrolladores)
 app.use('/api', routerUsuario)
