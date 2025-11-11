@@ -120,11 +120,6 @@ exports.updateProjectRepository = async (email_gerente, projectUpdated) => {
     console.log(proyectoActualizado)
     return proyectoActualizado.recordset[0];
 
-    /*if (proyectoActualizado.rowsAffected[0] == 0) {
-            return null
-        } else {
-            return { nombre, description, info_link, buscando_devs, contratos, id_gerente }
-    }*/
   } catch (error) {
     console.log(
      `Error en SQL REPOSITORY - updateProjectRepository - ${error}`
@@ -133,4 +128,30 @@ exports.updateProjectRepository = async (email_gerente, projectUpdated) => {
   } finally {
     //dbPool.close();
   }
+};
+
+exports.deleteProjectRepository = async (email_gerente) => {
+
+  let dbPool = await getPool();
+
+  try {
+    const query = `
+            DELETE
+            FROM
+                proyecto
+            WHERE
+                email_gerente = @email_gerente
+        `;
+    await dbPool.request().input("email_gerente",  sql.VarChar, email_gerente).query(query);
+
+    return email_gerente;
+  } catch (error) {
+
+    console.error("REPOSITORY - Error al eliminar proyecto: " + error.message);
+    throw Error(error.message);
+
+  }finally {
+    dbPool.close();
+  } 
+
 };

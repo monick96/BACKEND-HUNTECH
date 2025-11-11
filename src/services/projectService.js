@@ -5,20 +5,20 @@ const projectRepository = require('../repositories/projectRepository');
 // throw error para propagar el error y que lo tome el controller
 
 exports.createProject = async (project) => {
-    
+
     try {
-        
+
         if (!project.nombre) {
-            throw Error('Nombre es campo obligatorio' );
+            throw Error('Nombre es campo obligatorio');
         }
 
         if (!project.description) {
-            throw Error('description es campo obligatorio' );
+            throw Error('description es campo obligatorio');
         }
 
         if (!project.email_gerente) {
-            throw Error('email_gerente es campo obligatorio' );
-        } 
+            throw Error('email_gerente es campo obligatorio');
+        }
 
         if (project.buscando_devs && typeof project.buscando_devs !== 'boolean') {
 
@@ -26,14 +26,14 @@ exports.createProject = async (project) => {
         }
 
         return await projectRepository.createProyectRepository(project);
-        
+
     } catch (error) {
 
         console.error('SERVICE - Error al crear proyecto: ' + error);
 
         throw Error(error.message);
     }
-    
+
 }
 
 exports.getAllProjects = async () => {
@@ -44,7 +44,7 @@ exports.getAllProjects = async () => {
         console.error('SERVICE - Error al obtener proyectos: ' + error);
         throw Error(error.message);
     }
-    
+
 }
 
 exports.updateProject = async (emailGerente, projectUpdated) => {
@@ -57,3 +57,15 @@ exports.updateProject = async (emailGerente, projectUpdated) => {
         throw Error("Error en SERVICE - updateProject - " + error)
     }
 }
+
+exports.deleteProject = async (email) => {
+    try {
+        if (!email) {
+            throw Error("Se debe indicar el email del gerente cuyo proyecto se va a eliminar");
+        }
+        return await projectRepository.deleteProjectRepository(email)
+    } catch (error) {
+        console.error("SERVICE - Error al eliminar proyecto: " + error);
+        throw Error("Error al eliminar proyecto: " + error.message);
+    }
+};

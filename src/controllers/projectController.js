@@ -48,7 +48,7 @@ exports.updateProject = async (req, res) => {
         .send(`No se encuentra un proyecto a modificar con el emailGerente: ${emailGerente}`);
     }
 
-    
+
     res.status(200)
 
     res.json({
@@ -64,3 +64,19 @@ exports.updateProject = async (req, res) => {
     throw Error("ERROR 500");
   }
 };
+
+
+exports.deleteProject = async (req, res) => {
+  try {
+    let { email } = req.params;
+    result = await projectService.deleteProject(email)
+    res.status(201);
+    res.json({ message: 'proyecto eliminado', email: result });
+
+  } catch (error) {
+    console.error('Error al eliminar proyecto: ' + error);
+    res.status(500)
+    res.json({ error: 'Error al elimninar proyecto: ' + error.message });
+  }
+}
+

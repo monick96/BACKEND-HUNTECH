@@ -12,6 +12,7 @@ const projectController = require('../controllers/projectController')
 routerProyecto.get('/proyectos',projectController.readprojects);
 routerProyecto.post('/proyecto',projectController.createproject);
 routerProyecto.put('/proyecto/:emailGerente',projectController.updateProject)
+routerProyecto.delete('/proyecto/:email',projectController.deleteProject)
 
 
 
