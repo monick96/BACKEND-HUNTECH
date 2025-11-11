@@ -133,3 +133,30 @@ exports.updateDesarrolladorByEmail = async(req, res)=>{
         res.json({ error: 'Error al actualizar desarrollador: '+ error.message });
     }
 }
+
+exports.readUserByEmail = async(req, res)=>{
+    try {
+        let {email, tabla} = req.params;
+
+        result = await usuariosService.getUserByEmail(email, tabla);
+
+        res.status(200);
+        if (result.length == 0) {
+        res.json({ 
+            message: 'No hay ningún Usuario en ' +tabla+ ' con ese email',
+            count: result.length,
+            data:result });    
+        } else {
+            res.json({ 
+                message: 'Usuario obtenido correctamente', 
+                count: result.length, 
+                data: result 
+            });
+        }
+        
+    } catch (error) {
+        console.error('Error al obtener Usuario: ' + error);
+        res.status(500)
+        res.json({ error: 'Error al obtener Usuario: '+ error.message });
+    }
+}

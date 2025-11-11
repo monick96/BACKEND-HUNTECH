@@ -91,3 +91,20 @@ exports.updateDesarrolladorByEmail = async (email, desarrollador) => {
     throw Error(error.message);
   }
 };
+
+exports.getUserByEmail = async (email, tabla) => {
+  try {
+
+    if (!email) {
+      throw Error("Se debe indicar el email del usuario a buscar");
+    }
+
+    return await usuariosRepository.getUserByEmailRepository(email, tabla);
+
+  } catch (error) {
+
+    console.error("SERVICE - Error al buscar usuario: " + error);
+    throw Error("Error al buscar usuario: " + error.message);
+
+  }
+};
