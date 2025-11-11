@@ -8,11 +8,19 @@ exports.createProject = async (project) => {
     
     try {
         
-        if (!project.nombre || !project.description || !project.id_gerente || !project.email_gerente) {
-            throw Error('Nombre, descripcion, id_gerente, email_gerente  son campos obligatorios' );
+        if (!project.nombre) {
+            throw Error('Nombre es campo obligatorio' );
         }
 
-        if (typeof project.buscando_devs !== 'boolean') {
+        if (!project.description) {
+            throw Error('description es campo obligatorio' );
+        }
+
+        if (!project.email_gerente) {
+            throw Error('email_gerente es campo obligatorio' );
+        } 
+
+        if (project.buscando_devs && typeof project.buscando_devs !== 'boolean') {
 
             throw Error('El campo "buscando_devs" debe ser booleano');
         }
@@ -31,14 +39,21 @@ exports.createProject = async (project) => {
 exports.getAllProjects = async () => {
 
     try {
-
         return await projectRepository.getAllProjectsRepository();
-        
     } catch (error) {
-
         console.error('SERVICE - Error al obtener proyectos: ' + error);
-
         throw Error(error.message);
     }
     
+}
+
+exports.updateProject = async (emailGerente, projectUpdated) => {
+    try {
+        //console.log("SERVICE - UpdateProject")
+        //console.log(`PUT Contract - Body: ${projectUpdated}, - URL Param: ${id}`)
+        return await projectRepository.updateProjectRepository(emailGerente, projectUpdated)
+    } catch (error) {
+        console.log("Error en SERVICE - updateProject - " + error)
+        throw Error("Error en SERVICE - updateProject - " + error)
+    }
 }
