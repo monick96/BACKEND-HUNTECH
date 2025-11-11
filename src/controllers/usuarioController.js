@@ -2,13 +2,27 @@ const usuariosService = require('../services/usuariosService')
 
 exports.readUsuarioExistByEmail = async(req, res)=>{
     try {
-        result = await usuariosService.chequearSiExisteUsuarioConEmailRetornarNombreTabla(req.body);
-        res.status(200);
-        res.json({ 
-            message: 'El usuario ya existe en la DB', 
-            count: result.length, 
-            data: result 
-        });
+        let {email} = req.params;
+        console.log(email);
+        
+        result = await usuariosService.chequearSiExisteUsuarioConEmailRetornarNombreTabla(email);
+        console.log(result);
+        
+        if (result.existe === 1) {
+            res.status(200);
+            res.json({ 
+                message: 'El usuario ya existe en la DB', 
+                count: result.length, 
+                data: result 
+            });
+        } else {
+            res.status(404);
+            res.json({ 
+                message: 'El usuario no existe en la DB', 
+                count: result.length, 
+                data: result 
+            });
+        }
         
     } catch (error) {
         console.error('Error al buscar usuario por email: ' + error);

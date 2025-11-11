@@ -44,6 +44,53 @@ exports.chequearSiExisteUsuarioConEmail = async (usuario) => {
   } 
 };
 
+//este devuelve tambien el nombre de la tabla en que encontro el email
+exports.chequearSiExisteUsuarioConEmailRetornarNombreTabla = async (email) => {
+  let dbPool = await getPool();
+
+  try {
+    
+    const query = `
+            SELECT TOP 1 'gerente' AS tabla FROM gerente WHERE email = @email
+            UNION ALL
+            SELECT TOP 1 'desarrollador' AS tabla FROM desarrollador WHERE email = @email
+            UNION ALL
+            SELECT TOP 1 'institucion_educativa' AS tabla FROM institucion_educativa WHERE email = @email
+            ;
+        `;
+    
+    const result = await dbPool
+      .request()
+      .input("email", email)
+      .query(query);
+
+      console.log(result);
+      
+    //recosrset array objetos 
+    if (result.recordset.length > 0) {
+      // si hay coincidencia recordset[0].tabla tendra el nombre de la primera tabla donde lo ubico al email
+      return { existe: 1, tabla: result.recordset[0].tabla };
+    } else {
+      // si no se encontro en ninguna tabla
+      return { existe: 0, tabla: null };
+    }
+
+  } catch (error) {
+    console.error(
+      "REPOSITORY - Error al chequear si existen usuarios con ese email: " +
+        error
+    );
+    throw new Error(
+      "Error al chequear si existen usuarios con ese email " + error.message
+    );
+  }finally {
+        
+    dbPool.close(); // cerrar conexion al terminar la operacion
+
+  } 
+
+};
+
 /* ############# GERENTES ############# */
 
 exports.getAllGerentesRepository = async () => {
