@@ -9,7 +9,11 @@ const routerProyecto = require('./src/routers/routerProyecto');
 const routerUsuario = require('./src/routers/routerUsuario');
 
 const app = express();
+const cors = require('cors');
 app.use(express.json());
+app.use(cors({
+    origin: 'http://localhost:4200' 
+}));
 
 //rutass
 //raiz

@@ -3,10 +3,8 @@ const usuariosService = require('../services/usuariosService')
 exports.readUsuarioExistByEmail = async(req, res)=>{
     try {
         let {email} = req.params;
-        console.log(email);
         
         result = await usuariosService.chequearSiExisteUsuarioConEmailRetornarNombreTabla(email);
-        console.log(result);
         
         if (result.existe === 1) {
             res.status(200);
