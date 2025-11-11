@@ -3,10 +3,36 @@ const getPool = require("../dataBase/conexionSQL");
 const crypto = require('crypto');
 const sql = require("mssql");
 
-//CAPA REPOSITORY : metodos de CRUD a la DB
-//usamos return para enviar resultado a service y 
-// throw error para propagar el error y que lo tome el service,
-// y finalmente lo retorne controller
+exports.chequearSiExisteProyectoConEmail = async (proyecto) => {
+  let dbPool = await getPool();
+  try {
+    //console.log('REPOSITORIO proyecto: ', proyecto)
+    const query = `
+            SELECT CASE
+            WHEN
+                EXISTS (SELECT 1 FROM proyecto WHERE email_gerente = @email_gerente)
+            THEN 1 ELSE 0 END AS existe
+            ;
+        `;
+    const result = await dbPool
+      .request()
+      .input("email_gerente", proyecto.email_gerente)
+      .query(query);
+    return result.recordset[0].existe;
+  } catch (error) {
+    console.error(
+      "REPOSITORY - Error al chequear si existen proyectos asociados a un gerente con ese email: " +
+        error
+    );
+
+    throw Error( error.message);}
+    
+  finally {
+        
+    dbPool.close();
+
+  } 
+};
 
 exports.createProyectRepository = async (project) => {
     dbPool = await getPool();
@@ -120,11 +146,6 @@ exports.updateProjectRepository = async (email_gerente, projectUpdated) => {
     console.log(proyectoActualizado)
     return proyectoActualizado.recordset[0];
 
-    /*if (proyectoActualizado.rowsAffected[0] == 0) {
-            return null
-        } else {
-            return { nombre, description, info_link, buscando_devs, contratos, id_gerente }
-    }*/
   } catch (error) {
     console.log(
      `Error en SQL REPOSITORY - updateProjectRepository - ${error}`
@@ -133,4 +154,30 @@ exports.updateProjectRepository = async (email_gerente, projectUpdated) => {
   } finally {
     //dbPool.close();
   }
+};
+
+exports.deleteProjectRepository = async (email_gerente) => {
+
+  let dbPool = await getPool();
+
+  try {
+    const query = `
+            DELETE
+            FROM
+                proyecto
+            WHERE
+                email_gerente = @email_gerente
+        `;
+    await dbPool.request().input("email_gerente",  sql.VarChar, email_gerente).query(query);
+
+    return email_gerente;
+  } catch (error) {
+
+    console.error("REPOSITORY - Error al eliminar proyecto: " + error.message);
+    throw Error(error.message);
+
+  }finally {
+    dbPool.close();
+  } 
+
 };

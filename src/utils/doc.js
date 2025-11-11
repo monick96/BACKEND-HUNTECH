@@ -17,8 +17,7 @@ const DOC = {
             'api/carreras -> lista todas las carreras',
             'api/carreras_desarrollador -> lista todas las carreras por desarrollador',
             `api/existusuariobyemail -> devuelve true si hay un gerente, desarrollador, o institución educativa con el email pasado por parámetro
-            body: {"email": "pepito@gmail.com"}',` 
-
+            body: {"email": "pepito@gmail.com"}'`
           ],
       POST: [
             'api/proyecto -> crea nuevo proyecto (body: nombre(obligatorio), description(obligatorio, true o false), info_link(opcional),buscando_devs(obligatorio),id_gerente(obligatorio), email_gerente(obligatorio))',
@@ -26,8 +25,11 @@ const DOC = {
               postulaciones: string, -- lista de emails separados por coma, esta_ocupado: booleano 1 o 0, pasante_email:string,
               projecto_id: string, start_date string, end_date string`,
             'api/carrera -> crea una nueva carrera (nombre: string, info_link: string, status: string, id_institucion_educativa: string)',
-            'api/carrera_desarrollador -> crea una nueva carrera por desarrollador (id_desarrollador: string, id_carrera: string, start_date: string, end_date: string, isvalidated: boolean)'
-      ]
+            'api/carrera_desarrollador -> crea una nueva carrera por desarrollador (id_desarrollador: string, id_carrera: string, start_date: string, end_date: string, isvalidated: boolean)',
+            `api/proyecto -> crea un nuevo proyecto, previo validar que el gerente no 
+            tenga ya un proyecto {"nombre": string (opcional), "description": string (opcional), "info_link": string (opcional),
+             "buscando_devs": bool (opcional), "id_gerente": string (opcional /deprecated), "email_gerente": string}`            
+          ]
     },
     ejemploPostProyecto: {
       POST: 'api/proyecto',

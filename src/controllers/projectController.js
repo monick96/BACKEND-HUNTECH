@@ -7,6 +7,13 @@ const projectService = require("../services/projectService");
 exports.createproject = async (req, res) => {
   try {
     let project = req.body;
+
+    const elGerenteYaTieneProyecto = await projectService.chequearSiExisteProyectoConEmail(project)
+
+    if (elGerenteYaTieneProyecto == 1) {
+      return res.status(400).json({ message: 'El gerente ya tiene un proyecto. Cada gerente puede poseer solo un proyecto' });
+    }
+
     //retorna id del projecto creado o error
     result = await projectService.createProject(project);
     res.status(201);
@@ -48,7 +55,7 @@ exports.updateProject = async (req, res) => {
         .send(`No se encuentra un proyecto a modificar con el emailGerente: ${emailGerente}`);
     }
 
-    
+
     res.status(200)
 
     res.json({
@@ -64,3 +71,19 @@ exports.updateProject = async (req, res) => {
     throw Error("ERROR 500");
   }
 };
+
+
+exports.deleteProject = async (req, res) => {
+  try {
+    let { email } = req.params;
+    result = await projectService.deleteProject(email)
+    res.status(201);
+    res.json({ message: 'proyecto eliminado', email: result });
+
+  } catch (error) {
+    console.error('Error al eliminar proyecto: ' + error);
+    res.status(500)
+    res.json({ error: 'Error al elimninar proyecto: ' + error.message });
+  }
+}
+
