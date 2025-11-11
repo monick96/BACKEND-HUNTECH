@@ -106,6 +106,47 @@ exports.deleteGerente = async(req, res)=>{
 }
 
 /* ############# DESARROLLADORES ############# */
+
+exports.readDesarrolladores = async(req, res)=>{
+    try {
+        result = await usuariosService.getAllDesarrolladores(),
+        res.status(200);
+        res.json({ 
+            message: 'Desarrolladores obtenidos correctamente', 
+            count: result.length, 
+            data: result 
+        });
+        
+    } catch (error) {
+        console.error('Error al obtener desarrolladores: ' + error);
+        res.status(500)
+        res.json({ error: 'Error al obtener desarrolladores: '+ error.message });
+    }
+}
+
+exports.readDesarrolladorByEmail = async(req, res) => {
+    try {
+        let desarrollador = req.body;
+        result = await usuariosService.getDesarrolladorByEmail(desarrollador)
+        res.status(201);       
+        if (result.length == 0) {
+        res.json({ 
+            message: 'No hay ningún desarrollador con ese email',
+            count: result.length,
+            data:result });    
+        } else {
+            res.json({ 
+            message: 'desarrollador hallado',
+            count: result.length,
+            data:result });
+        }
+    } catch (error) {
+        console.error('Error al obtener el desarrollador: ' + error);
+        res.status(500)
+        res.json({ error: 'Error al obtener el desarrollador: '+ error.message });
+    }
+}
+
 exports.createDesarrollador = async(req, res)=>{
     try {
         let desarrollador = req.body;
@@ -125,6 +166,20 @@ exports.createDesarrollador = async(req, res)=>{
         console.error('Error al crear desarrollador: ' + error);
         res.status(500)
         res.json({ error: 'Error al crear desarrollador: '+ error.message });
+    }
+}
+
+exports.deleteDesarrollador = async(req, res)=>{
+    try {
+        let desarrollador = req.body;
+        result = await usuariosService.deleteDesarrollador(desarrollador)
+        res.status(201);       
+        res.json({ message: 'desarrollador eliminado', gerente_email:result });
+        
+    } catch (error) {
+        console.error('Error al eliminar desarrollador: ' + error);
+        res.status(500)
+        res.json({ error: 'Error al elimninar desarrollador: '+ error.message });
     }
 }
 
