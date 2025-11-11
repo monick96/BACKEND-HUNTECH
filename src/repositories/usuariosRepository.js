@@ -3,13 +3,16 @@ ni se va a crear nada llamado usuarios. Pero en términos conceptuales (o en POO
 desarrolladores, gerentes, e instituciones educativas. la idea es que este flujo se encargue del CRUD de los 3 */
 
 const getPool = require("../dataBase/conexionSQL");
+const sql = require('mssql');
+const crypto = require('crypto');
+const {TABLAS_PERMITIDAS} =  require("../utils/constants");
 
 /* ############# USUARIOS ############# */
 
 exports.chequearSiExisteUsuarioConEmail = async (usuario) => {
+  let dbPool = await getPool();
   try {
     //console.log('REPOSITORIO usuario: ', usuario)
-    let dbPool = await getPool();
     const query = `
             SELECT CASE
             WHEN
@@ -31,17 +34,23 @@ exports.chequearSiExisteUsuarioConEmail = async (usuario) => {
       "REPOSITORY - Error al chequear si existen usuarios con ese email: " +
         error
     );
-    throw Error(
-      "Error al chequear si existen usuarios con ese email " + error.message
-    );
-  }
+
+    throw Error( error.message);}
+    
+  finally {
+        
+    dbPool.close(); // cerrar conexion al terminar la operacion
+
+  } 
 };
 
 /* ############# GERENTES ############# */
 
 exports.getAllGerentesRepository = async () => {
+  let dbPool = await getPool();
+
   try {
-    let dbPool = await getPool();
+  
     const result = await dbPool.request().query(`
             SELECT
                 *
@@ -49,15 +58,25 @@ exports.getAllGerentesRepository = async () => {
                 gerente
             `);
     return result.recordset;
+
   } catch (error) {
+
     console.error("REPOSITORY - Error al obtener gerentes: " + error);
-    throw Error("Error al obtener Gerentes: " + error.message);
-  }
+    throw Error(error.message);
+
+  }finally {
+        
+    dbPool.close(); // cerrar conexion al terminar la operacion
+
+  } 
 };
 
 exports.getGerenteByEmailRepository = async (gerente) => {
+
+  let dbPool = await getPool();
+
   try {
-    let dbPool = await getPool();
+    
     const query = `
             SELECT
                 *
@@ -68,20 +87,28 @@ exports.getGerenteByEmailRepository = async (gerente) => {
             `;
     const result = await dbPool
       .request()
-      .input("email", gerente.email)
+      .input("email", sql.VarChar, gerente.email)
       .query(query);
     return result.recordset;
   } catch (error) {
+
     console.error(
       "REPOSITORY - Error al obtener el gerente solicitado: " + error
     );
-    throw Error("Error al obtener el gerente solicitado: " + error.message);
-  }
+    throw Error(error.message);
+
+  }finally {
+        
+    dbPool.close(); // cerrar conexion al terminar la operacion
+
+  } 
 };
 
 exports.createGerenteRepository = async (gerente) => {
+  dbPool = await getPool();
+
   try {
-    dbPool = await getPool();
+    
     const query = `
             INSERT INTO
                 dbo.gerente
@@ -91,23 +118,32 @@ exports.createGerenteRepository = async (gerente) => {
         `;
     await dbPool
       .request()
-      .input("email", gerente.email)
-      .input("id_gerente", gerente.id_gerente || "")
-      .input("id_proyecto", gerente.id_proyecto || "")
-      .input("nombre", gerente.nombre || "")
-      .input("descripcion", gerente.descripcion || "")
+      .input("email",  sql.VarChar, gerente.email)
+      .input("id_gerente", sql.VarChar, gerente.id_gerente || "")
+      .input("id_proyecto",  sql.VarChar, gerente.id_proyecto || "")
+      .input("nombre",  sql.VarChar, gerente.nombre || "")
+      .input("descripcion", sql.VarChar, gerente.descripcion || "")
       .query(query);
+
     return gerente.email;
+
   } catch (error) {
+
     console.error("REPOSITORY - Error al crear gerente: " + error.message);
-    throw Error("Error al crear gerente: " + error.message);
-  }
+    throw Error(error.message);
+
+  }finally {
+        
+    dbPool.close(); // cerrar conexion al terminar la operacion
+
+  } 
 };
 
 exports.deleteGerenteRepository = async (gerente) => {
-  try {
-    dbPool = await getPool();
 
+  let dbPool = await getPool();
+
+  try {
     const query = `
             DELETE
             FROM
@@ -115,11 +151,150 @@ exports.deleteGerenteRepository = async (gerente) => {
             WHERE
                 gerente.email = @email
         `;
-    await dbPool.request().input("email", gerente.email).query(query);
+    await dbPool.request().input("email",  sql.VarChar, gerente.email).query(query);
 
     return gerente.email;
   } catch (error) {
+
     console.error("REPOSITORY - Error al eliminar gerente: " + error.message);
-    throw Error("Error al eliminar gerente: " + error.message);
+    throw Error(error.message);
+
+  }finally {
+        
+    dbPool.close(); // cerrar conexion al terminar la operacion
+
+  } 
+
+};
+
+/* ############# DESARROLLADORES ############# */
+///por cuestiones de tiempo solo voy a crear con campos basicos
+exports.createDesarrolladorRepository = async (desarrollador) => {
+
+  let dbPool = await getPool();//esto aca aveces rompe el metodo??
+  //si, por que el scope es el try, si esta dentro dell try, no alcanza al finally
+
+  try {
+
+    let id = crypto.randomUUID();//id random con libreria incluida een node
+    const query = `
+            INSERT INTO
+                dbo.desarrollador
+                (email, id, nombre, descripcion)
+            VALUES
+                (@email, @id, @nombre, @descripcion)
+        `;
+    await dbPool
+      .request()
+      .input("email", sql.VarChar, desarrollador.email)
+      .input("id", sql.VarChar, id)
+      .input("nombre",  sql.VarChar,desarrollador.nombre || "")
+      .input("descripcion",  sql.VarChar, desarrollador.descripcion || "")
+      .query(query);
+
+    return desarrollador.email;
+
+  } catch (error) {
+
+    console.error("REPOSITORY - Error al crear desarrollador: " + error.message);
+    throw Error("Error al crear desarrollador: " + error.message);
+
+  }finally {
+        
+    dbPool.close(); // cerrar conexion al terminar la operacion
+
+  } 
+};
+
+//actualiza desarrollador por email y retorna todo el objeto actualizado
+exports.updateDesarrolladorByEmailRepository = async (email, desarrollador) => {
+  let dbPool = await getPool();
+
+  try {
+    let {nombre, descripcion, skills} = desarrollador;
+    
+    let request = dbPool.request().input('email', sql.VarChar, email);
+
+    if (nombre != null) {request.input('nombre', sql.VarChar, nombre); } 
+    if (descripcion != null) {request.input('descripcion', sql.VarChar, descripcion); }
+  
+    let query = `UPDATE dbo.desarrollador SET `;
+    if (nombre != null) { query += `nombre = @nombre, `; }
+    
+    if (skills != null) {
+      const skillsStr = Array.isArray(skills) ? skills.join(',') : skills;
+      request.input('skills', sql.VarChar, skillsStr);
+      query += `skills = @skills, `;
+    }
+
+    if (descripcion != null) { query += `descripcion = @descripcion, `; } 
+
+    query = query.trim().replace(/,$/, "")
+    query += ' OUTPUT INSERTED.* ';
+    query += ' WHERE email = @email'
+              
+        
+    let result = await request.query(query);
+
+    /*let updatedFields= [];
+
+    for (let name in request.parameters)
+    {
+        if (name != "id")updatedFields.push(name)
+    };*/
+
+    //return updatedFields; //ahora devuelve los campos que se actualizaron
+
+    return result.recordset[0];
+
+  } catch (error) {
+
+    console.error("REPOSITORY - Error al actualiza desarrollador: " + error.message);
+    throw Error("Error al actualizar desarrollador: " + error.message);
+
+  }finally{
+
+    dbPool.close();
+
+  }
+};
+
+//objeto usuario con email y nombre de la tabla
+exports.getUserByEmailRepository = async (email, tabla) => {
+  let dbPool = await getPool();
+
+  try {
+
+    if (!TABLAS_PERMITIDAS.includes(tabla)) {
+      throw Error('Tabla no permitida');
+    }
+
+    const query = `
+            SELECT
+                *
+            FROM
+                ${tabla}
+            WHERE
+              ${tabla}.email = @email
+            `;
+    const result = await dbPool
+      .request()
+      .input("email", sql.VarChar, email)
+      .query(query);
+
+    return result.recordset[0];
+
+  } catch (error) {
+
+    console.error(
+      "REPOSITORY - Error al obtener el usuario solicitado: " + error
+    );
+
+    throw Error(error.message);
+
+  }finally{
+
+    dbPool.close();
+
   }
 };

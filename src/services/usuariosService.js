@@ -61,3 +61,50 @@ exports.deleteGerente = async (gerente) => {
     throw Error("Error al eliminar gerente: " + error.message);
   }
 };
+
+/* ############# DESARROLLADORES ############# */
+exports.createDesarrollador = async (desarrollador) => {
+  try {
+    if (!desarrollador.email) {
+      throw Error("Se debe indicar el email del desarrollador");
+    }
+    return await usuariosRepository.createDesarrolladorRepository(desarrollador);
+  } catch (error) {
+    console.error("SERVICE - Error al crear desarrollador: " + error);
+    throw Error("Error al crear desarrollador: " + error.message);
+  }
+};
+
+exports.updateDesarrolladorByEmail = async (email, desarrollador) => {
+  try {
+
+    if (!email) {
+      throw Error("Se debe indicar el email del desarrollador");
+    }
+
+    return await usuariosRepository.updateDesarrolladorByEmailRepository(email, desarrollador);
+
+  } catch (error) {
+
+    console.error("SERVICE - Error al actualizar desarrollador: " + error);
+
+    throw Error(error.message);
+  }
+};
+
+exports.getUserByEmail = async (email, tabla) => {
+  try {
+
+    if (!email) {
+      throw Error("Se debe indicar el email del usuario a buscar");
+    }
+
+    return await usuariosRepository.getUserByEmailRepository(email, tabla);
+
+  } catch (error) {
+
+    console.error("SERVICE - Error al buscar usuario: " + error);
+    throw Error("Error al buscar usuario: " + error.message);
+
+  }
+};
