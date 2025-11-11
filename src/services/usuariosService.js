@@ -15,6 +15,21 @@ exports.chequearSiExisteUsuarioConEmail = async (usuario) => {
   }
 };
 
+////este me retorna 1 si exite y la tabla donde lo encontro/ lo necesecito para validar 
+// si debo crear al usuario en la base de datos desde el front
+exports.chequearSiExisteUsuarioConEmailRetornarNombreTabla = async (email) => {
+  try {
+    if (!email) {
+      throw Error("Se debe indicar el email del usuario a buscar");
+    }
+    
+    return await usuariosRepository.chequearSiExisteUsuarioConEmailRetornarNombreTabla(email);
+  } catch (error) {
+    console.error("SERVICE - Error al chequear si existen usuarios: " + error);
+    throw Error("Error al chequear si existen usuarios: " + error.message);
+  }
+};
+
 /* GERENTES */
 
 exports.getAllGerentes = async () => {
