@@ -92,3 +92,26 @@ exports.deleteGerente = async(req, res)=>{
         res.json({ error: 'Error al elimninar gerente: '+ error.message });
     }
 }
+
+/* ############# DESARROLLADORES ############# */
+exports.createDesarrollador = async(req, res)=>{
+    try {
+        let desarrollador = req.body;
+
+        const elEmailYaEstaEnUso = await usuariosService.chequearSiExisteUsuarioConEmail(desarrollador);
+
+        if (elEmailYaEstaEnUso == 1) {
+            return res.status(400).json({ message: 'Ya existe un usuario con ese email' });
+        }
+
+        result = await usuariosService.createDesarrollador(desarrollador)
+        res.status(201);       
+        res.json({ message: 'desarrollador creado', email:result });   
+    
+    }  
+    catch (error) {
+        console.error('Error al crear desarrollador: ' + error);
+        res.status(500)
+        res.json({ error: 'Error al crear desarrollador: '+ error.message });
+    }
+}

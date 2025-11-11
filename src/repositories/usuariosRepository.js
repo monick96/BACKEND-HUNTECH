@@ -123,3 +123,39 @@ exports.deleteGerenteRepository = async (gerente) => {
     throw Error("Error al eliminar gerente: " + error.message);
   }
 };
+
+/* ############# DESARROLLADORES ############# */
+///por cuestiones de tiempo solo voy a crear con campos basicos
+exports.createDesarrolladorRepository = async (desarrollador) => {
+
+  //let dbPool = await getPool();
+
+  try {
+
+    let dbPool = await getPool();//esto aca aveces rompe el metodo??
+
+    let id = crypto.randomUUID();//id random con libreria incluida een node
+    const query = `
+            INSERT INTO
+                dbo.desarrollador
+                (email, id, nombre, descripcion)
+            VALUES
+                (@email, @id, @nombre, @descripcion)
+        `;
+    await dbPool
+      .request()
+      .input("email", desarrollador.email)
+      .input("id", id)
+      .input("nombre", desarrollador.nombre || "")
+      .input("descripcion", desarrollador.descripcion || "")
+      .query(query);
+    return desarrollador.email;
+  } catch (error) {
+    console.error("REPOSITORY - Error al crear desarrollador: " + error.message);
+    throw Error("Error al crear desarrollador: " + error.message);
+  }finally {
+        
+     dbPool.close(); // cerrar conexion al terminar la operacion
+
+  } 
+};

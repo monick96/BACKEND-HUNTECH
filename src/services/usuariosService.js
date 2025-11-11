@@ -61,3 +61,16 @@ exports.deleteGerente = async (gerente) => {
     throw Error("Error al eliminar gerente: " + error.message);
   }
 };
+
+/* ############# DESARROLLADORES ############# */
+exports.createDesarrollador = async (desarrollador) => {
+  try {
+    if (!desarrollador.email) {
+      throw Error("Se debe indicar el email del desarrollador");
+    }
+    return await usuariosRepository.createDesarrolladorRepository(desarrollador);
+  } catch (error) {
+    console.error("SERVICE - Error al crear desarrollador: " + error);
+    throw Error("Error al crear desarrollador: " + error.message);
+  }
+};
