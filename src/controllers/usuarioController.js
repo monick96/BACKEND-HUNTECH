@@ -142,10 +142,12 @@ exports.readUserByEmail = async(req, res)=>{
 
         res.status(200);
         if (result.length == 0) {
+            
         res.json({ 
             message: 'No hay ningún Usuario en ' +tabla+ ' con ese email',
             count: result.length,
             data:result });    
+
         } else {
             res.json({ 
                 message: 'Usuario obtenido correctamente', 
