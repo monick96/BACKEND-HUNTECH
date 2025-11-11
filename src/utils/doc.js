@@ -15,7 +15,10 @@ const DOC = {
             'api/contratos -> lista todos los contratos',
             'api/contratos_by_emailgerente -> body: {"emailGerente": "pepito@gmail.com"}',
             'api/carreras -> lista todas las carreras',
-            'api/carreras_desarrollador -> lista todas las carreras por desarrollador'
+            'api/carreras_desarrollador -> lista todas las carreras por desarrollador',
+            `api/existusuariobyemail -> devuelve true si hay un gerente, desarrollador, o institución educativa con el email pasado por parámetro
+            body: {"email": "pepito@gmail.com"}',` 
+
           ],
       POST: [
             'api/proyecto -> crea nuevo proyecto (body: nombre(obligatorio), description(obligatorio, true o false), info_link(opcional),buscando_devs(obligatorio),id_gerente(obligatorio), email_gerente(obligatorio))',
