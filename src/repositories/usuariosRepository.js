@@ -5,9 +5,9 @@ desarrolladores, gerentes, e instituciones educativas. la idea es que este flujo
 const getPool = require("../dataBase/conexionSQL");
 const sql = require('mssql');
 const crypto = require('crypto');
-const {TABLAS_PERMITIDAS} =  require("../utils/constants");
+const { TABLAS_PERMITIDAS } = require("../utils/constants");
 
-/* ############# USUARIOS ############# */
+/* ############# USUARIOS EN GENERAL ############# */
 
 exports.chequearSiExisteUsuarioConEmail = async (usuario) => {
   let dbPool = await getPool();
@@ -32,16 +32,17 @@ exports.chequearSiExisteUsuarioConEmail = async (usuario) => {
   } catch (error) {
     console.error(
       "REPOSITORY - Error al chequear si existen usuarios con ese email: " +
-        error
+      error
     );
 
-    throw Error( error.message);}
-    
+    throw Error(error.message);
+  }
+
   finally {
-        
+
     dbPool.close(); // cerrar conexion al terminar la operacion
 
-  } 
+  }
 };
 
 //este devuelve tambien el nombre de la tabla en que encontro el email
@@ -49,7 +50,7 @@ exports.chequearSiExisteUsuarioConEmailRetornarNombreTabla = async (email) => {
   let dbPool = await getPool();
 
   try {
-    
+
     const query = `
             SELECT TOP 1 'gerente' AS tabla FROM gerente WHERE email = @email
             UNION ALL
@@ -58,12 +59,12 @@ exports.chequearSiExisteUsuarioConEmailRetornarNombreTabla = async (email) => {
             SELECT TOP 1 'institucion_educativa' AS tabla FROM institucion_educativa WHERE email = @email
             ;
         `;
-    
+
     const result = await dbPool
       .request()
       .input("email", email)
       .query(query);
-      
+
     //recosrset array objetos 
     if (result.recordset.length > 0) {
       // si hay coincidencia recordset[0].tabla tendra el nombre de la primera tabla donde lo ubico al email
@@ -76,18 +77,114 @@ exports.chequearSiExisteUsuarioConEmailRetornarNombreTabla = async (email) => {
   } catch (error) {
     console.error(
       "REPOSITORY - Error al chequear si existen usuarios con ese email: " +
-        error
+      error
     );
     throw new Error(
       "Error al chequear si existen usuarios con ese email " + error.message
     );
-  }finally {
-        
+  } finally {
+
     dbPool.close(); // cerrar conexion al terminar la operacion
 
-  } 
+  }
 
 };
+
+//actualiza cualquier tipo de usuario por email y retorna todo el objeto actualizado
+exports.updateUsuarioByEmailRepository = async (email, usuario) => {
+
+  let dbPool = await getPool();
+
+  //el front ya sabe el tipo de usuario así que lo puede mandar desde el form
+  try {
+
+    //si el usuario fuera gerente:
+    if (usuario.rol == "gerente") {
+
+      //toma los datos del gerente que vinieron desde el body de la req en el controller
+      let { id_gerente, id_proyecto, nombre, email, descripcion } = usuario;
+
+      //crea un dbpool request con el mail que vino desde el controller por parámetro
+      let request = dbPool.request().input('email', sql.VarChar, email);
+
+      //solo agrega input para las propiedades enviadas
+      if (nombre != null) { request.input('nombre', sql.VarChar, nombre); }
+      if (descripcion != null) { request.input('descripcion', sql.VarChar, descripcion); }
+      if ( id_gerente != null) { request.input('id_gerente', sql.VarChar, id_gerente); }
+      if ( id_proyecto != null) { request.input('id_proyecto', sql.VarChar, id_proyecto); }
+
+      //crea la query
+      let query = `UPDATE dbo.gerente SET `;
+      //solo modifica campos correspondientes a las propiedades enviadas
+      if (nombre != null) { query += `nombre = @nombre, `; }
+      if (descripcion != null) { query += `descripcion = @descripcion, `; }
+      if (id_gerente != null) { query += `id_gerente = @id_gerente, `; }
+      if (id_proyecto != null) { query += `id_proyecto = @id_proyecto, `; }
+
+      //limpia comas sobrantes y espacios en blanco
+      query = query.trim().replace(/,$/, "")
+      //retorna las columnas que hayan sido modificadas
+      query += ' OUTPUT INSERTED.* ';
+      //usando el email recibido desde el controller por parámetro
+      query += ' WHERE email = @email'
+
+      let result = await request.query(query);
+      //retorna al servicio un objeto con estos campos. 
+      return result.recordset[0];
+
+    } else {
+      //si el usuario fuera desarro
+      // llador... igual que gerente.
+      if (usuario.rol == "desarrollador") {
+
+        let { nombre, descripcion, skills } = usuario;
+
+        let request = dbPool.request().input('email', sql.VarChar, email);
+
+        if (nombre != null) { request.input('nombre', sql.VarChar, nombre); }
+        if (descripcion != null) { request.input('descripcion', sql.VarChar, descripcion); }
+
+        let query = `UPDATE dbo.desarrollador SET `;
+        if (nombre != null) { query += `nombre = @nombre, `; }
+
+        if (skills != null) {
+          const skillsStr = Array.isArray(skills) ? skills.join(',') : skills;
+          request.input('skills', sql.VarChar, skillsStr);
+          query += `skills = @skills, `;
+        }
+
+        if (descripcion != null) { query += `descripcion = @descripcion, `; }
+
+        query = query.trim().replace(/,$/, "")
+        query += ' OUTPUT INSERTED.* ';
+        query += ' WHERE email = @email'
+
+        let result = await request.query(query);
+        
+        return result.recordset[0];
+
+      } else {
+        if (usuario.rol == "institucion_educativa") {
+          //a desarrollar más adelante
+          return [{"estado" : "a desarrollar"}]
+        }
+      }
+    }
+
+  } catch (error) {
+
+    console.error("REPOSITORY - Error al actualizar usuario: " + error.message);
+    throw Error("Error al actualizar usuario: " + error.message);
+
+  } finally {
+
+    dbPool.close();
+
+  }
+};
+
+
+
 
 /* ############# GERENTES ############# */
 
@@ -95,7 +192,7 @@ exports.getAllGerentesRepository = async () => {
   let dbPool = await getPool();
 
   try {
-  
+
     const result = await dbPool.request().query(`
             SELECT
                 *
@@ -109,11 +206,11 @@ exports.getAllGerentesRepository = async () => {
     console.error("REPOSITORY - Error al obtener gerentes: " + error);
     throw Error(error.message);
 
-  }finally {
-        
+  } finally {
+
     dbPool.close(); // cerrar conexion al terminar la operacion
 
-  } 
+  }
 };
 
 exports.getGerenteByEmailRepository = async (gerente) => {
@@ -121,7 +218,7 @@ exports.getGerenteByEmailRepository = async (gerente) => {
   let dbPool = await getPool();
 
   try {
-    
+
     const query = `
             SELECT
                 *
@@ -142,18 +239,18 @@ exports.getGerenteByEmailRepository = async (gerente) => {
     );
     throw Error(error.message);
 
-  }finally {
-        
+  } finally {
+
     dbPool.close(); // cerrar conexion al terminar la operacion
 
-  } 
+  }
 };
 
 exports.createGerenteRepository = async (gerente) => {
   dbPool = await getPool();
 
   try {
-    
+
     const query = `
             INSERT INTO
                 dbo.gerente
@@ -163,10 +260,10 @@ exports.createGerenteRepository = async (gerente) => {
         `;
     await dbPool
       .request()
-      .input("email",  sql.VarChar, gerente.email)
+      .input("email", sql.VarChar, gerente.email)
       .input("id_gerente", sql.VarChar, gerente.id_gerente || "")
-      .input("id_proyecto",  sql.VarChar, gerente.id_proyecto || "")
-      .input("nombre",  sql.VarChar, gerente.nombre || "")
+      .input("id_proyecto", sql.VarChar, gerente.id_proyecto || "")
+      .input("nombre", sql.VarChar, gerente.nombre || "")
       .input("descripcion", sql.VarChar, gerente.descripcion || "")
       .query(query);
 
@@ -177,11 +274,11 @@ exports.createGerenteRepository = async (gerente) => {
     console.error("REPOSITORY - Error al crear gerente: " + error.message);
     throw Error(error.message);
 
-  }finally {
-        
+  } finally {
+
     dbPool.close(); // cerrar conexion al terminar la operacion
 
-  } 
+  }
 };
 
 exports.deleteGerenteRepository = async (gerente) => {
@@ -196,7 +293,7 @@ exports.deleteGerenteRepository = async (gerente) => {
             WHERE
                 gerente.email = @email
         `;
-    await dbPool.request().input("email",  sql.VarChar, gerente.email).query(query);
+    await dbPool.request().input("email", sql.VarChar, gerente.email).query(query);
 
     return gerente.email;
   } catch (error) {
@@ -204,11 +301,11 @@ exports.deleteGerenteRepository = async (gerente) => {
     console.error("REPOSITORY - Error al eliminar gerente: " + error.message);
     throw Error(error.message);
 
-  }finally {
-        
+  } finally {
+
     dbPool.close(); // cerrar conexion al terminar la operacion
 
-  } 
+  }
 
 };
 
@@ -229,9 +326,9 @@ exports.getAllDesarrolladoresRepository = async () => {
   } catch (error) {
     console.error("REPOSITORY - Error al obtener desarrolladores: " + error);
     throw Error(error.message);
-  }finally {
+  } finally {
     dbPool.close(); // cerrar conexion al terminar la operacion
-  } 
+  }
 };
 
 exports.getDesarrolladorByEmailRepository = async (desarrollador) => {
@@ -258,11 +355,11 @@ exports.getDesarrolladorByEmailRepository = async (desarrollador) => {
     );
     throw Error(error.message);
 
-  }finally {
-        
+  } finally {
+
     dbPool.close(); // cerrar conexion al terminar la operacion
 
-  } 
+  }
 };
 
 
@@ -283,10 +380,10 @@ exports.createDesarrolladorRepository = async (desarrollador) => {
       .request()
       .input("email", sql.VarChar, desarrollador.email)
       .input("id", sql.VarChar, id)
-      .input("nombre",  sql.VarChar,desarrollador.nombre || "")
+      .input("nombre", sql.VarChar, desarrollador.nombre || "")
       .input("apellido", sql.VarChar, desarrollador.apellido || "")
-      .input("descripcion",  sql.VarChar, desarrollador.descripcion || "")
-      .input("fecha_nacimiento",  sql.VarChar, desarrollador.fecha_nacimiento || "")
+      .input("descripcion", sql.VarChar, desarrollador.descripcion || "")
+      .input("fecha_nacimiento", sql.VarChar, desarrollador.fecha_nacimiento || "")
       .query(query);
 
     return desarrollador.email;
@@ -296,11 +393,11 @@ exports.createDesarrolladorRepository = async (desarrollador) => {
     console.error("REPOSITORY - Error al crear desarrollador: " + error.message);
     throw Error("Error al crear desarrollador: " + error.message);
 
-  }finally {
-        
+  } finally {
+
     dbPool.close(); // cerrar conexion al terminar la operacion
 
-  } 
+  }
 };
 
 exports.deleteDesarrolladorRepository = async (desarrollador) => {
@@ -313,45 +410,46 @@ exports.deleteDesarrolladorRepository = async (desarrollador) => {
             WHERE
                 desarrollador.email = @email
         `;
-    await dbPool.request().input("email",  sql.VarChar, desarrollador.email).query(query);
+    await dbPool.request().input("email", sql.VarChar, desarrollador.email).query(query);
 
     return desarrollador.email;
   } catch (error) {
     console.error("REPOSITORY - Error al eliminar desarrollador: " + error.message);
     throw Error(error.message);
-  }finally {
+  } finally {
     dbPool.close(); // cerrar conexion al terminar la operacion
-  } 
+  }
 };
 
 //actualiza desarrollador por email y retorna todo el objeto actualizado
+/* MÉTODO DEPRECADO AHORA RUTIAMOS TODOS LOS PUT DE USUARIO POR EL MÉTODO GENÉRICO DE USUARIO */
 exports.updateDesarrolladorByEmailRepository = async (email, desarrollador) => {
   let dbPool = await getPool();
 
   try {
-    let {nombre, descripcion, skills} = desarrollador;
-    
+    let { nombre, descripcion, skills } = desarrollador;
+
     let request = dbPool.request().input('email', sql.VarChar, email);
 
-    if (nombre != null) {request.input('nombre', sql.VarChar, nombre); } 
-    if (descripcion != null) {request.input('descripcion', sql.VarChar, descripcion); }
-  
+    if (nombre != null) { request.input('nombre', sql.VarChar, nombre); }
+    if (descripcion != null) { request.input('descripcion', sql.VarChar, descripcion); }
+
     let query = `UPDATE dbo.desarrollador SET `;
     if (nombre != null) { query += `nombre = @nombre, `; }
-    
+
     if (skills != null) {
       const skillsStr = Array.isArray(skills) ? skills.join(',') : skills;
       request.input('skills', sql.VarChar, skillsStr);
       query += `skills = @skills, `;
     }
 
-    if (descripcion != null) { query += `descripcion = @descripcion, `; } 
+    if (descripcion != null) { query += `descripcion = @descripcion, `; }
 
     query = query.trim().replace(/,$/, "")
     query += ' OUTPUT INSERTED.* ';
     query += ' WHERE email = @email'
-              
-        
+
+
     let result = await request.query(query);
 
     /*let updatedFields= [];
@@ -370,7 +468,7 @@ exports.updateDesarrolladorByEmailRepository = async (email, desarrollador) => {
     console.error("REPOSITORY - Error al actualiza desarrollador: " + error.message);
     throw Error("Error al actualizar desarrollador: " + error.message);
 
-  }finally{
+  } finally {
 
     dbPool.close();
 
@@ -410,7 +508,7 @@ exports.getUserByEmailRepository = async (email, tabla) => {
 
     throw Error(error.message);
 
-  }finally{
+  } finally {
 
     dbPool.close();
 
