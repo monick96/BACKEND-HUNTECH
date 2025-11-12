@@ -10,6 +10,7 @@ const projectController = require('../controllers/projectController')
 //  e injectado en el metodo correspondiente
 
 routerProyecto.get('/proyectos',projectController.readprojects);
+routerProyecto.get('/proyecto/:email_gerente',projectController.readProyectoByEmail)
 routerProyecto.post('/proyecto',projectController.createproject);
 routerProyecto.put('/proyecto/:emailGerente',projectController.updateProject)
 routerProyecto.delete('/proyecto/:email',projectController.deleteProject)

@@ -58,8 +58,19 @@ exports.getAllProjects = async () => {
         console.error('SERVICE - Error al obtener proyectos: ' + error);
         throw Error(error.message);
     }
-
 }
+
+exports.getProjectByEmail = async (email_gerente) => {
+  try {
+    if (!email_gerente) {
+      throw Error("Se debe indicar el email del gerente del proyecto");
+    }
+    return await projectRepository.getProyectoByEmailRepository(email_gerente);
+  } catch (error) {
+    console.error("SERVICE - Error al buscar un proyecto con ese email: " + error);
+    throw Error("Error al buscar un proyecto con ese email: " + error.message);
+  }
+};
 
 exports.updateProject = async (emailGerente, projectUpdated) => {
     try {

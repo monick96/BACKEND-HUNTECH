@@ -102,6 +102,39 @@ exports.getAllProjectsRepository = async () => {
     } 
 }
 
+exports.getProyectoByEmailRepository = async (email_gerente) => {
+
+  let dbPool = await getPool();
+
+  try {
+
+    const query = `
+            SELECT
+                *
+            FROM
+                proyecto
+            WHERE
+                proyecto.email_gerente = @email_gerente
+            `;
+    const result = await dbPool
+      .request()
+      .input("email_gerente", sql.VarChar, email_gerente)
+      .query(query);
+    return result.recordset;
+  } catch (error) {
+
+    console.error(
+      "REPOSITORY - Error al obtener el proyecto solicitado: " + error
+    );
+    throw Error(error.message);
+
+  } finally {
+
+    dbPool.close(); // cerrar conexion al terminar la operacion
+
+  }
+};
+
 exports.updateProjectRepository = async (email_gerente, projectUpdated) => {
   const {
     nombre,
