@@ -102,7 +102,7 @@ exports.updateUsuarioByEmailRepository = async (email, usuario) => {
     if (usuario.rol == "gerente") {
 
       //toma los datos del gerente que vinieron desde el body de la req en el controller
-      let { id_gerente, id_proyecto, nombre, email, descripcion } = usuario;
+      let { id_gerente, id_proyecto, nombre, descripcion } = usuario;
 
       //crea un dbpool request con el mail que vino desde el controller por parámetro
       let request = dbPool.request().input('email', sql.VarChar, email);
@@ -129,12 +129,12 @@ exports.updateUsuarioByEmailRepository = async (email, usuario) => {
       query += ' WHERE email = @email'
 
       let result = await request.query(query);
+      
       //retorna al servicio un objeto con estos campos. 
       return result.recordset[0];
 
     } else {
-      //si el usuario fuera desarro
-      // llador... igual que gerente.
+      //si el usuario fuera desarrollador... igual que gerente.
       if (usuario.rol == "desarrollador") {
 
         let { nombre, descripcion, skills } = usuario;

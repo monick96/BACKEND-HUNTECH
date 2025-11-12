@@ -34,7 +34,6 @@ exports.updateUsuarioByEmail = async (req, res) => {
         let { email } = req.params;
         let usuario = req.body;
 
-
         usuarioExiste = await usuariosService.chequearSiExisteUsuarioConEmailRetornarNombreTabla(email);
 
         if (usuarioExiste.existe == 0) {
@@ -42,8 +41,8 @@ exports.updateUsuarioByEmail = async (req, res) => {
             res.status(200)
             res.json({ error: 'no existe ningun usuario con ese email' });
         } else {
+            
             let result = await usuariosService.updateUsuarioByEmail(email, usuario);
-
             res.status(200);
             res.json({ message: 'usuario actualizado', data: result });
         }
