@@ -157,3 +157,50 @@ exports.getUserByEmail = async (email, tabla) => {
 
   }
 };
+
+
+/*  INSTITUCIONES EDUCATIVAS  */
+exports.getAllInstituciones = async () => {
+  try {
+    return await usuariosRepository.getAllInstitucionesRepository();
+  } catch (error) {
+    console.error("SERVICE - Error al obtener instituciones educativas: " + error);
+    throw Error("Error al obtener instituciones educativas: " + error.message);
+  }
+};
+
+exports.getInstitucionByEmail = async (institucion) => {
+  try {
+    if (!institucion.email) {
+      throw Error("Se debe indicar el email de la institución educativa a buscar");
+    }
+    return await usuariosRepository.getInstitucionByEmailRepository(institucion);
+  } catch (error) {
+    console.error("SERVICE - Error al buscar esa institución educativa: " + error);
+    throw Error("Error al buscar esa institución educativa: " + error.message);
+  }
+};
+
+exports.createInstitucion = async (institucion) => {
+  try {
+    if (!institucion.email) {
+      throw Error("Se debe indicar el email de la institución educativa");
+    }
+    return await usuariosRepository.createInstitucionRepository(institucion);
+  } catch (error) {
+    console.error("SERVICE - Error al crear institución educativa: " + error);
+    throw Error("Error al crear institución educativa: " + error.message);
+  }
+};
+
+exports.deleteInstitucion = async (institucion) => {
+  try {
+    if (!institucion.email) {
+      throw Error("Se debe indicar el email de la institución educativa a eliminar");
+    }
+    return await usuariosRepository.deleteInstitucionRepository(institucion);
+  } catch (error) {
+    console.error("SERVICE - Error al eliminar institución educativa: " + error);
+    throw Error("Error al eliminar institución educativa: " + error.message);
+  }
+};
