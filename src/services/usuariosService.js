@@ -1,6 +1,6 @@
 const usuariosRepository = require("../repositories/usuariosRepository");
 
-/* USUARIOS */
+/* USUARIOS DE TODO TIPO */
 
 exports.chequearSiExisteUsuarioConEmail = async (usuario) => {
   //console.log('SERVICE usuario: ', usuario)
@@ -15,8 +15,8 @@ exports.chequearSiExisteUsuarioConEmail = async (usuario) => {
   }
 };
 
-////este me retorna 1 si exite y la tabla donde lo encontro/ lo necesecito para validar 
-// si debo crear al usuario en la base de datos desde el front
+// retorna 1 si exite y la tabla donde lo encontro/ lo necesecito para validar 
+// si corresponde crear al usuario en la base de datos desde el front
 exports.chequearSiExisteUsuarioConEmailRetornarNombreTabla = async (email) => {
   try {
     if (!email) {
@@ -29,6 +29,26 @@ exports.chequearSiExisteUsuarioConEmailRetornarNombreTabla = async (email) => {
     throw Error("Error al chequear si existen usuarios: " + error.message);
   }
 };
+
+exports.updateUsuarioByEmail = async (email, usuario) => {
+  try {
+
+    if (!email) {
+      throw Error("Se debe indicar el email del usuario");
+    }
+
+    return await usuariosRepository.updateUsuarioByEmailRepository(email, usuario);
+
+  } catch (error) {
+
+    console.error("SERVICE - Error al actualizar usuario: " + error);
+
+    throw Error(error.message);
+  }
+};
+
+
+
 
 /* GERENTES */
 

@@ -8,6 +8,9 @@ routerUsuario.get('/user/:email', usuarioController.readUsuarioExistByEmail)
 /* Ruta con tabla por parámetros para utilizar la data que se obtiene del método anterior */
 routerUsuario.get('/user/:email/:tabla', usuarioController.readUserByEmail)
 
+routerUsuario.put('/usuario/:email', usuarioController.updateUsuarioByEmail)
+
+
 /* ###Gerentes### */
 routerUsuario.get('/gerentes', usuarioController.readGerentes)
 routerUsuario.get('/gerentebyemail', usuarioController.readGerenteByEmail)
