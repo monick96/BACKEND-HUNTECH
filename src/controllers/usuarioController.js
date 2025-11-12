@@ -131,6 +131,7 @@ exports.deleteGerente = async (req, res) => {
     } catch (error) {
         console.error('Error al eliminar gerente: ' + error);
         res.status(500)
+
         res.json({ error: 'Error al elimninar gerente: ' + error.message });
     }
 }
@@ -260,5 +261,83 @@ exports.readUserByEmail = async (req, res) => {
         console.error('Error al obtener Usuario: ' + error);
         res.status(500)
         res.json({ error: 'Error al obtener Usuario: ' + error.message });
+    }
+}
+
+
+/* INSTITUCIONES EDUCATIVAS */
+exports.readInstituciones = async(req, res)=>{
+    try {
+        result = await usuariosService.getAllInstituciones(),
+        res.status(200);
+        res.json({ 
+            message: 'instituciones educativas obtenidas correctamente', 
+            count: result.length, 
+            data: result 
+        });
+        
+    } catch (error) {
+        console.error('Error al obtener instituciones educativas: ' + error);
+        res.status(500)
+        res.json({ error: 'Error al obtener instituciones educativas: '+ error.message });
+    }
+}
+
+exports.readInstitucionByEmail = async(req, res) => {
+    try {
+        let institucion = req.body;
+        result = await usuariosService.getInstitucionByEmail(institucion)
+        res.status(201);       
+        if (result.length == 0) {
+        res.json({ 
+            message: 'No hay ninguna institución educativa con ese email',
+            count: result.length,
+            data:result });    
+        } else {
+            res.json({ 
+            message: 'institución educativa hallada',
+            count: result.length,
+            data:result });
+        }
+    } catch (error) {
+        console.error('Error al obtener institución educativa: ' + error);
+        res.status(500)
+        res.json({ error: 'Error al obtener institución educativa: '+ error.message });
+    }
+}
+
+exports.createInstitucion = async(req, res)=>{
+    try {
+        let institucion = req.body;
+
+        const elEmailYaEstaEnUso = await usuariosService.chequearSiExisteUsuarioConEmail(institucion);
+
+        if (elEmailYaEstaEnUso == 1) {
+            return res.status(400).json({ message: 'Ya existe una institucion educativa con ese email' });
+        }
+
+        result = await usuariosService.createInstitucion(institucion)
+        res.status(201);       
+        res.json({ message: 'institucion educativa creada', email_institucion:result });   
+    
+    }  
+    catch (error) {
+        console.error('Error al crear institucion educativa: ' + error);
+        res.status(500)
+        res.json({ error: 'Error al crear institucion educativa: '+ error.message });
+    }
+}
+    
+exports.deleteInstitucion = async(req, res)=>{
+    try {
+        let institucion = req.body;
+        result = await usuariosService.deleteInstitucion(institucion)
+        res.status(201);       
+        res.json({ message: 'institucion educativa eliminada', email_institucion:result });
+        
+    } catch (error) {
+        console.error('Error al eliminar institucion educativa: ' + error);
+        res.status(500)
+        res.json({ error: 'Error al eliminar institucion educativa: '+ error.message });
     }
 }

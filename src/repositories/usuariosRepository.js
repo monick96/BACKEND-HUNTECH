@@ -514,3 +514,125 @@ exports.getUserByEmailRepository = async (email, tabla) => {
 
   }
 };
+ 
+
+
+/* ############# INSTITUCIONES EDUCATIVAS ############# */
+exports.getAllInstitucionesRepository = async () => {
+  let dbPool = await getPool();
+
+  try {
+  
+    const result = await dbPool.request().query(`
+            SELECT
+                *
+            FROM
+                institucion_educativa
+            `);
+    return result.recordset;
+
+  } catch (error) {
+
+    console.error("REPOSITORY - Error al obtener instituciones educativas: " + error);
+    throw Error(error.message);
+
+  }finally {
+        
+    dbPool.close(); 
+
+  } 
+};
+
+exports.getInstitucionByEmailRepository = async (institucion) => {
+
+  let dbPool = await getPool();
+
+  try {
+    
+    const query = `
+            SELECT
+                *
+            FROM
+                institucion_educativa
+            WHERE
+                institucion_educativa.email = @email
+            `;
+    const result = await dbPool
+      .request()
+      .input("email", sql.VarChar, institucion.email)
+      .query(query);
+    return result.recordset;
+  } catch (error) {
+
+    console.error(
+      "REPOSITORY - Error al obtener la institucion educativa solicitada: " + error
+    );
+    throw Error(error.message);
+
+  }finally {
+        
+    dbPool.close(); 
+
+  } 
+};
+
+exports.createInstitucionRepository = async (institucion) => {
+  dbPool = await getPool();
+
+  try {
+    
+    const query = `
+            INSERT INTO
+                dbo.institucion_educativa
+                (id, nombre, email)
+            VALUES
+                (@id, @nombre, @email)
+        `;
+    await dbPool
+      .request()
+      .input("id",  sql.VarChar, institucion.id || "")
+      .input("nombre",  sql.VarChar, institucion.nombre || "")
+      .input("email", sql.VarChar, institucion.email || "")
+      .query(query);
+
+    return institucion.email;
+
+  } catch (error) {
+
+    console.error("REPOSITORY - Error al crear institucion educativa: " + error.message);
+    throw Error(error.message);
+
+  }finally {
+        
+    dbPool.close(); 
+
+  } 
+};
+
+exports.deleteInstitucionRepository = async (institucion) => {
+
+  let dbPool = await getPool();
+
+  try {
+    const query = `
+            DELETE
+            FROM
+                institucion_educativa
+            WHERE
+                institucion_educativa.email = @email
+        `;
+    await dbPool.request().input("email",  sql.VarChar, institucion.email).query(query);
+
+    return institucion.email;
+  } catch (error) {
+
+    console.error("REPOSITORY - Error al eliminar institucion educativa: " + error.message);
+    throw Error(error.message);
+
+  }finally {
+        
+    dbPool.close(); 
+
+  } 
+
+};

@@ -25,6 +25,10 @@ routerUsuario.delete('/desarrollador', usuarioController.deleteDesarrollador)
 routerUsuario.put('/desarrollador/:email', usuarioController.updateDesarrolladorByEmail)
 
 
-
+/* ###Instituciones Educativas### */
+routerUsuario.get('/instituciones_educativas', usuarioController.readInstituciones)
+routerUsuario.get('/institucion_educativabyemail', usuarioController.readInstitucionByEmail)
+routerUsuario.post('/institucion_educativa', usuarioController.createInstitucion)
+routerUsuario.delete('/institucion_educativa', usuarioController.deleteInstitucion)
 
 module.exports = routerUsuario;
