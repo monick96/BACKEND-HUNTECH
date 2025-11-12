@@ -79,10 +79,7 @@ exports.updateProject = async (req, res) => {
         .status(404)
         .send(`No se encuentra un proyecto a modificar con el emailGerente: ${emailGerente}`);
     }
-
-
     res.status(200)
-
     res.json({
       message: "proyectos actualizado",
       data: project,
