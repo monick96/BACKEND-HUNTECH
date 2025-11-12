@@ -42,6 +42,31 @@ exports.readprojects = async (req, res) => {
   }
 };
 
+exports.readProyectoByEmail = async (req, res) => {
+    try {
+        let { email_gerente } = req.params;
+        result = await projectService.getProjectByEmail(email_gerente)
+        res.status(201);
+        if (result.length == 0) {
+            res.json({
+                message: 'No hay ningún proyecto con ese email',
+                count: result.length,
+                data: result
+            });
+        } else {
+            res.json({
+                message: 'proyecto hallado',
+                count: result.length,
+                data: result
+            });
+        }
+    } catch (error) {
+        console.error('Error al obtener el proyecto: ' + error);
+        res.status(500)
+        res.json({ error: 'Error al obtener el proyecto: ' + error.message });
+    }
+}
+
 exports.updateProject = async (req, res) => {
   try {
     const projectUpdated = req.body;
