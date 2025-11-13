@@ -1,0 +1,226 @@
+const usuariosRepository = require("../repositories/usuariosRepository");
+
+/* USUARIOS DE TODO TIPO */
+
+exports.chequearSiExisteUsuarioConEmail = async (usuario) => {
+  //console.log('SERVICE usuario: ', usuario)
+  try {
+    if (!usuario.email) {
+      throw Error("Se debe indicar el email del usuario a buscar");
+    }
+    return await usuariosRepository.chequearSiExisteUsuarioConEmail(usuario);
+  } catch (error) {
+    console.error("SERVICE - Error al chequear si existen usuarios: " + error);
+    throw Error("Error al chequear si existen usuarios: " + error.message);
+  }
+};
+
+// retorna 1 si exite y la tabla donde lo encontro/ lo necesecito para validar 
+// si corresponde crear al usuario en la base de datos desde el front
+exports.chequearSiExisteUsuarioConEmailRetornarNombreTabla = async (email) => {
+  try {
+    if (!email) {
+      throw Error("Se debe indicar el email del usuario a buscar");
+    }
+    
+    return await usuariosRepository.chequearSiExisteUsuarioConEmailRetornarNombreTabla(email);
+  } catch (error) {
+    console.error("SERVICE - Error al chequear si existen usuarios: " + error);
+    throw Error("Error al chequear si existen usuarios: " + error.message);
+  }
+};
+
+exports.updateUsuarioByEmail = async (email, usuario) => {
+  try {
+
+    if (!email) {
+      throw Error("Se debe indicar el email del usuario");
+    }
+
+    return await usuariosRepository.updateUsuarioByEmailRepository(email, usuario);
+
+  } catch (error) {
+
+    console.error("SERVICE - Error al actualizar usuario: " + error);
+
+    throw Error(error.message);
+  }
+};
+
+
+
+
+/* GERENTES */
+
+exports.getAllGerentes = async () => {
+  try {
+    return await usuariosRepository.getAllGerentesRepository();
+  } catch (error) {
+    console.error("SERVICE - Error al obtener gerentes: " + error);
+    throw Error("Error al obtener gerentes: " + error.message);
+  }
+};
+
+exports.getGerenteByEmail = async (gerente) => {
+  try {
+    if (!gerente.email) {
+      throw Error("Se debe indicar el email del gerente a buscar");
+    }
+    return await usuariosRepository.getGerenteByEmailRepository(gerente);
+  } catch (error) {
+    console.error("SERVICE - Error al buscar ese gerente: " + error);
+    throw Error("Error al buscar ese gerente: " + error.message);
+  }
+};
+
+exports.createGerente = async (gerente) => {
+  try {
+    if (!gerente.email) {
+      throw Error("Se debe indicar el email del gerente");
+    }
+    return await usuariosRepository.createGerenteRepository(gerente);
+  } catch (error) {
+    console.error("SERVICE - Error al crear gerente: " + error);
+    throw Error("Error al crear gerente: " + error.message);
+  }
+};
+
+exports.deleteGerente = async (gerente) => {
+  try {
+    if (!gerente.email) {
+      throw Error("Se debe indicar el email del gerente a eliminar");
+    }
+    return await usuariosRepository.deleteGerenteRepository(gerente);
+  } catch (error) {
+    console.error("SERVICE - Error al eliminar gerente: " + error);
+    throw Error("Error al eliminar gerente: " + error.message);
+  }
+};
+
+/* ############# DESARROLLADORES ############# */
+
+exports.getAllDesarrolladores = async () => {
+  try {
+    return await usuariosRepository.getAllDesarrolladoresRepository();
+  } catch (error) {
+    console.error("SERVICE - Error al obtener desarrolladores: " + error);
+    throw Error("Error al obtener desarrolladores: " + error.message);
+  }
+};
+
+exports.getDesarrolladorByEmail = async (desarrollador) => {
+  try {
+    if (!desarrollador.email) {
+      throw Error("Se debe indicar el email del desarrollador a buscar");
+    }
+    return await usuariosRepository.getDesarrolladorByEmailRepository(desarrollador);
+  } catch (error) {
+    console.error("SERVICE - Error al buscar ese desarrollador: " + error);
+    throw Error("Error al buscar ese desarrollador: " + error.message);
+  }
+};
+
+exports.createDesarrollador = async (desarrollador) => {
+  try {
+    if (!desarrollador.email) {
+      throw Error("Se debe indicar el email del desarrollador");
+    }
+    return await usuariosRepository.createDesarrolladorRepository(desarrollador);
+  } catch (error) {
+    console.error("SERVICE - Error al crear desarrollador: " + error);
+    throw Error("Error al crear desarrollador: " + error.message);
+  }
+};
+
+exports.updateDesarrolladorByEmail = async (email, desarrollador) => {
+  try {
+
+    if (!email) {
+      throw Error("Se debe indicar el email del desarrollador");
+    }
+
+    return await usuariosRepository.updateDesarrolladorByEmailRepository(email, desarrollador);
+
+  } catch (error) {
+
+    console.error("SERVICE - Error al actualizar desarrollador: " + error);
+
+    throw Error(error.message);
+  }
+};
+
+exports.deleteDesarrollador = async (desarrollador) => {
+  try {
+    if (!desarrollador.email) {
+      throw Error("Se debe indicar el email del desarrollador a eliminar");
+    }
+    return await usuariosRepository.deleteDesarrolladorRepository(desarrollador);
+  } catch (error) {
+    console.error("SERVICE - Error al eliminar desarrollador: " + error);
+    throw Error("Error al eliminar desarrollador: " + error.message);
+  }
+};
+
+exports.getUserByEmail = async (email, tabla) => {
+  try {
+
+    if (!email) {
+      throw Error("Se debe indicar el email del usuario a buscar");
+    }
+
+    return await usuariosRepository.getUserByEmailRepository(email, tabla);
+
+  } catch (error) {
+
+    console.error("SERVICE - Error al buscar usuario: " + error);
+    throw Error("Error al buscar usuario: " + error.message);
+
+  }
+};
+
+
+/*  INSTITUCIONES EDUCATIVAS  */
+exports.getAllInstituciones = async () => {
+  try {
+    return await usuariosRepository.getAllInstitucionesRepository();
+  } catch (error) {
+    console.error("SERVICE - Error al obtener instituciones educativas: " + error);
+    throw Error("Error al obtener instituciones educativas: " + error.message);
+  }
+};
+
+exports.getInstitucionByEmail = async (institucion) => {
+  try {
+    if (!institucion.email) {
+      throw Error("Se debe indicar el email de la institución educativa a buscar");
+    }
+    return await usuariosRepository.getInstitucionByEmailRepository(institucion);
+  } catch (error) {
+    console.error("SERVICE - Error al buscar esa institución educativa: " + error);
+    throw Error("Error al buscar esa institución educativa: " + error.message);
+  }
+};
+
+exports.createInstitucion = async (institucion) => {
+  try {
+    if (!institucion.email) {
+      throw Error("Se debe indicar el email de la institución educativa");
+    }
+    return await usuariosRepository.createInstitucionRepository(institucion);
+  } catch (error) {
+    console.error("SERVICE - Error al crear institución educativa: " + error);
+    throw Error("Error al crear institución educativa: " + error.message);
+  }
+};
+
+exports.deleteInstitucion = async (institucion) => {
+  try {
+    if (!institucion.email) {
+      throw Error("Se debe indicar el email de la institución educativa a eliminar");
+    }
+    return await usuariosRepository.deleteInstitucionRepository(institucion);
+  } catch (error) {
+    console.error("SERVICE - Error al eliminar institución educativa: " + error);
+    throw Error("Error al eliminar institución educativa: " + error.message);
+  }
+};

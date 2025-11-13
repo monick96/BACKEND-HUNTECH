@@ -9,7 +9,13 @@ const projectController = require('../controllers/projectController')
 // el objeto req y  res creado por express a partir de la solicitud http
 //  e injectado en el metodo correspondiente
 
-routerProyecto.post('/proyecto',projectController.createproject);
 routerProyecto.get('/proyectos',projectController.readprojects);
+routerProyecto.get('/proyecto/:email_gerente',projectController.readProyectoByEmail)
+routerProyecto.post('/proyecto',projectController.createproject);
+routerProyecto.put('/proyecto/:emailGerente',projectController.updateProject)
+routerProyecto.delete('/proyecto/:email',projectController.deleteProject)
+
+
+
 
 module.exports = routerProyecto; 
