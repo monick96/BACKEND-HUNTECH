@@ -7,5 +7,7 @@ routerContrato.get('/contratoslibres',contractController.readContracts)
 routerContrato.get('/contratos_by_emailgerente', contractController.readContractsByGerenteEmail)
 routerContrato.post('/contrato',contractController.createContract)
 routerContrato.put("/contrato/:id/", contractController.updateContract)
+routerContrato.delete('/contrato/:id',contractController.deleteContract)
+
 
 module.exports = routerContrato;
