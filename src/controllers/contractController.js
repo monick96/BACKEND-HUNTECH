@@ -101,4 +101,20 @@ exports.updateContract = async (req, res) => {
   
   }
 };
+
+exports.deleteContract = async (req, res) => {
+  try {
+    let { id } = req.params;
+    result = await contractService.deleteContract(id)
+    res.status(201);
+    res.json({ message: 'contrato eliminado', id: result });
+
+  } catch (error) {
+    console.error('Error al eliminar contrato: ' + error);
+    res.status(500)
+    res.json({ error: 'Error al elimninar contrato: ' + error.message });
+  }
+}
+
+
   

@@ -191,14 +191,6 @@ let queryActualizada = "UPDATE contrato SET ";
         
     return contratoActualizado.recordset[0];
 
-
-
-
-
-
-
-
-
     return updatedFields;
     //console.log("Results object:", results);  DA UNDEFINED Y NO SE PUEDE ARREGLAR A ESTA ALTURA CREO QUE ES ALGO DE AWS.
   } catch (error) {
@@ -209,4 +201,31 @@ let queryActualizada = "UPDATE contrato SET ";
   } finally {
     //dbPool.close();
   }
+};
+
+
+exports.deleteContractRepository = async (id) => {
+
+  let dbPool = await getPool();
+
+  try {
+    const query = `
+            DELETE
+            FROM
+                contrato
+            WHERE
+                id = @id
+        `;
+    await dbPool.request().input("id",  sql.Int, id).query(query);
+
+    return id;
+  } catch (error) {
+
+    console.error("REPOSITORY - Error al eliminar contrato: " + error.message);
+    throw Error(error.message);
+
+  }finally {
+    dbPool.close();
+  } 
+
 };

@@ -65,3 +65,15 @@ exports.updateContract = async (id, contractUpdated) => {
         throw Error("Error en SERVICE - updateContract - " + error)
     }
 }
+
+exports.deleteContract = async (id) => {
+    try {
+        if (!id) {
+            throw Error("Se debe indicar la id del contrato a eliminar");
+        }
+        return await contractRepository.deleteContractRepository(id)
+    } catch (error) {
+        console.error("SERVICE - Error al eliminar contrato: " + error);
+        throw Error("Error al eliminar contrato: " + error.message);
+    }
+};
