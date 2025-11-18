@@ -203,6 +203,34 @@ let queryActualizada = "UPDATE contrato SET ";
   }
 };
 
+exports.asignarCandidatoRepository = async (id, emailPasante) => {
+  dbPool = await getPool();
+
+  try {
+    const request = dbPool.request()
+      .input("id", sql.Int, id)
+      .input("esta_ocupado", sql.Bit, 1)
+      .input("pasante_email", sql.VarChar, emailPasante);
+
+    const query = `
+      UPDATE contrato
+      SET 
+        esta_ocupado = @esta_ocupado,
+        pasante_email = @pasante_email
+      OUTPUT INSERTED.*
+      WHERE id = @id
+    `;
+
+    const result = await request.query(query);
+    return result.recordset[0];
+
+  } catch (error) {
+    console.log(` Error en SQL REPOSITORY - asignarCandidatoRepository - ${error}`);
+    throw error;
+  }
+};
+
+
 
 exports.deleteContractRepository = async (id) => {
 

@@ -102,6 +102,33 @@ exports.updateContract = async (req, res) => {
   }
 };
 
+exports.asignarCandidato = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const emailPasante = req.body.pasante_email;
+
+    const contrato = await contractService.asignarCandidato(id, emailPasante);
+    
+    if (contrato.length === 0) {
+      return res
+        .status(404)
+        .send(`No se encuentra un contrato a modificar con la id: ${id}`);
+    }
+    res.status(200)
+    res.json({
+      message: `contrato actualizado con la asignación del pasante ${emailPasante}`,
+      data: contrato,
+    });
+  } catch (error) {
+    res.status(500).send({
+      code: 500,
+      message: "Error al actualizar el contrato: " + error.message,
+    });
+    throw Error("ERROR 500");
+  
+  }
+};
+
 exports.deleteContract = async (req, res) => {
   try {
     let { id } = req.params;

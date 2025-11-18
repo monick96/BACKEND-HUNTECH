@@ -66,6 +66,15 @@ exports.updateContract = async (id, contractUpdated) => {
     }
 }
 
+exports.asignarCandidato = async (id, emailPasante) => {
+    try {
+        return await contractRepository.asignarCandidatoRepository(id, emailPasante)
+    } catch (error) {
+        console.log("Error en SERVICE - asignarCandidato - " + error)
+        throw Error("Error en SERVICE - asignarCandidato - " + error)
+    }
+}
+
 exports.deleteContract = async (id) => {
     try {
         if (!id) {
