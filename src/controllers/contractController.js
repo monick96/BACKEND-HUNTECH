@@ -40,23 +40,26 @@ exports.readNonOccupiedContracts = async (req, res) => {
   
 exports.readContractsByGerenteEmail = async (req, res) => {
   try {
-    let emailGerente = req.body;
-    (result = await contractService.getContractsByGerenteEmail(emailGerente)),
-      res.status(200);
+
+    let emailGerente = req.params.emailgerente;
+
+    result = await contractService.getContractsByGerenteEmail(emailGerente);
+    res.status(200);
     res.json({
       message: `contratos obtenidos correctamnte`,
-      count: result.length,
+      //count: result.length,
       data: result,
     });
+
   } catch (error) {
     console.error(
-      `Error al obtener contratos para el gerente ${req.body.emailGerente} ` +
+      `Error al obtener contratos para el gerente ${req.params.emailGerente} ` +
         error
     );
     res.status(500);
     res.json({
       error:
-        `Error al obtener contratos para el gerente ${req.body} ` +
+        `Error al obtener contratos para el gerente ${req.params.emailGerente} ` +
         error.message,
     });
   }

@@ -22,7 +22,7 @@ exports.getAllNonOccuppiedContracts = async () => {
 
 exports.getContractsByGerenteEmail = async (emailGerente) => {
     try {
-        return await contractRepository.getContractsByGerenteEmail(emailGerente);
+        return await contractRepository.getContractsByGerenteEmailRepository(emailGerente);
     } catch (error) {
         console.error(`SERVICE - Error al obtener contratos para el gerente ${emailGerente}: ` + error);
         throw Error(`Error al obtener contratos para el gerente ${emailGerente} `+ error.message);        

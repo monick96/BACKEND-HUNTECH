@@ -4,7 +4,7 @@ const contractController = require('../controllers/contractController');
 
 routerContrato.get('/contratos',contractController.readContracts)
 routerContrato.get('/contratoslibres',contractController.readContracts)
-routerContrato.get('/contratos_by_emailgerente', contractController.readContractsByGerenteEmail)
+routerContrato.get('/contratos/:emailgerente', contractController.readContractsByGerenteEmail)
 routerContrato.post('/contrato',contractController.createContract)
 routerContrato.put("/contrato/:id/", contractController.updateContract)
 routerContrato.delete('/contrato/:id',contractController.deleteContract)
