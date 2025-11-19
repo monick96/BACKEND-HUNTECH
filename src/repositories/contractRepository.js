@@ -37,7 +37,7 @@ exports.getAllNotOcuppiedContractsRepository = async () => {
     console.error("REPOSITORY - Error al obtener contratos: " + error);
     throw Error("Error al obtener Contratos: " + error.message);
   } finally {
-    if (dbPool) {     // ✔️ validar que exista antes de cerrar
+    if (dbPool) {
       dbPool.close();
     }
   }
