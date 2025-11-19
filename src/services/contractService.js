@@ -25,17 +25,17 @@ exports.getContractsByGerenteEmail = async (emailGerente) => {
         return await contractRepository.getContractsByGerenteEmailRepository(emailGerente);
     } catch (error) {
         console.error(`SERVICE - Error al obtener contratos para el gerente ${emailGerente}: ` + error);
-        throw Error(`Error al obtener contratos para el gerente ${emailGerente} `+ error.message);        
+        throw Error(`Error al obtener contratos para el gerente ${emailGerente} ` + error.message);
     }
 }
 
-exports.createContract = async (contract) => { 
+exports.createContract = async (contract) => {
     try {
         if (!contract.tipo) {
-            throw Error('Se debe indicar el tipo de contrato' );
+            throw Error('Se debe indicar el tipo de contrato');
         }
         if (!contract.titulo) {
-            throw Error('Se debe indicar el título del contrato' );
+            throw Error('Se debe indicar el título del contrato');
         }
         if (!contract.proyecto_id) {
             throw Error('Se debe indicar proyecto_id del contrato');
@@ -48,7 +48,7 @@ exports.createContract = async (contract) => {
         }
 
         return await contractRepository.createContractRepository(contract)
-        
+
     } catch (error) {
         console.error('SERVICE - Error al crear contrato: ' + error);
         throw Error('Error al crear Contrato: ' + error.message);
@@ -65,6 +65,28 @@ exports.updateContract = async (id, contractUpdated) => {
         throw Error("Error en SERVICE - updateContract - " + error)
     }
 }
+
+exports.asignarCandidato = async (id, emailPasante) => {
+    try {
+        if (!emailPasante || typeof emailPasante !== 'string' || emailPasante.trim() === '') {
+            throw Error('Se debe indicar un emailPasante válido');
+        }
+        const resp = await contractRepository.asignarCandidatoRepository(id, emailPasante);
+        if (resp?.notFound) {
+            throw Error("NOT_FOUND");
+        }
+        if (resp?.alreadyOccupied) {
+            throw Error("OCCUPIED");
+        }
+        return resp;
+    } catch (error) {
+         if (error instanceof Error) {
+            throw error;
+        } else {
+            throw new Error("Error en SERVICE - asignarCandidato - " + error);
+        }
+    }
+};
 
 exports.deleteContract = async (id) => {
     try {
