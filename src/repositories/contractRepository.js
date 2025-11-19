@@ -21,24 +21,27 @@ exports.getAllContractsRepository = async () => {
     }
   };
 
-  exports.getAllNotOcuppiedContractsRepository = async () => {
-    try {
-      let dbPool = await getPool();
-      const result = await dbPool.request().query(`
+exports.getAllNotOcuppiedContractsRepository = async () => {
+  let dbPool;
+  try {
+    dbPool = await getPool();
+    const result = await dbPool.request().query(`
               SELECT
                   *
               FROM
                   contrato
-                  where esta_ocupado = false
+                  where esta_ocupado = 0
               `);
-      return result;
-    } catch (error) {
-      console.error("REPOSITORY - Error al obtener contratos: " + error);
-      throw Error("Error al obtener Contratos: " + error.message);
-    } finally {
+    return result.recordset;
+  } catch (error) {
+    console.error("REPOSITORY - Error al obtener contratos: " + error);
+    throw Error("Error al obtener Contratos: " + error.message);
+  } finally {
+    if (dbPool) {
       dbPool.close();
     }
-  };
+  }
+};
 
 exports.getContractsByGerenteEmailRepository = async (emailGerente) => {
   let dbPool = await getPool();
