@@ -210,6 +210,26 @@ exports.asignarCandidatoRepository = async (id, emailPasante) => {
   dbPool = await getPool();
 
   try {
+    //Checkeo si el contrato ya esta tomado
+    const checkRequest = dbPool.request()
+      .input("id", sql.Int, id);
+
+    const checkQuery = `
+      SELECT esta_ocupado 
+      FROM contrato 
+      WHERE id = @id
+    `;
+
+    const checkResult = await checkRequest.query(checkQuery);
+
+    if (checkResult.recordset.length === 0) {
+      return { notFound: true };
+    }
+
+    if (checkResult.recordset[0].esta_ocupado === true) {
+      return { alreadyOccupied: true };
+    }
+    //Si no esta tomado continuo a actualizarlo
     const request = dbPool.request()
       .input("id", sql.Int, id)
       .input("esta_ocupado", sql.Bit, 1)
