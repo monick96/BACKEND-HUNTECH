@@ -112,7 +112,7 @@ exports.asignarCandidato = async (req, res) => {
 
     const contrato = await contractService.asignarCandidato(id, emailPasante);
 
-    res.status(200)
+    res.status(200);
     res.json({
       message: `contrato actualizado con la asignación del pasante ${emailPasante}`,
       data: contrato,

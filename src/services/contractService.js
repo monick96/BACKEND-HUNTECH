@@ -68,16 +68,23 @@ exports.updateContract = async (id, contractUpdated) => {
 
 exports.asignarCandidato = async (id, emailPasante) => {
     try {
+        if (!emailPasante || typeof emailPasante !== 'string' || emailPasante.trim() === '') {
+            throw Error('Se debe indicar un emailPasante válido');
+        }
         const resp = await contractRepository.asignarCandidatoRepository(id, emailPasante);
         if (resp?.notFound) {
-            throw new Error("NOT_FOUND");
+            throw Error("NOT_FOUND");
         }
         if (resp?.alreadyOccupied) {
-            throw new Error("OCCUPIED");
+            throw Error("OCCUPIED");
         }
         return resp;
     } catch (error) {
-        throw Error("Error en SERVICE - asignarCandidato - " + error);
+         if (error instanceof Error) {
+            throw error;
+        } else {
+            throw new Error("Error en SERVICE - asignarCandidato - " + error);
+        }
     }
 };
 
