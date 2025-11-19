@@ -40,12 +40,13 @@ exports.getAllContractsRepository = async () => {
     }
   };
 
-  exports.getContractsByGerenteEmail = async (emailGerente) => {
+exports.getContractsByGerenteEmailRepository = async (emailGerente) => {
+  let dbPool = await getPool();
   try {
-    let dbPool = await getPool();
+    
     const result = await dbPool
       .request()
-      .input("email", emailGerente.emailGerente) //agregue esto por que asi lo hacia gustavo y lei que es para evitar injeccion sql
+      .input("email", emailGerente) //agregue esto por que asi lo hacia gustavo y lei que es para evitar injeccion sql
       .query(`    
         SELECT
             *
@@ -62,14 +63,16 @@ exports.getAllContractsRepository = async () => {
                         p.email_gerente = @email
         )
     `);
-    return result;
+    
+    return result.recordset;
+    
   } catch (error) {
     console.error(
       "REPOSITORY - Error al obtener contratos por gerente: " + error
     );
     throw Error("Error al obtener Contratos: " + error.message);
   } finally {
-    //dbPool.close();
+    dbPool.close();
   }
 };
 
