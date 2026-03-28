@@ -2,61 +2,64 @@
 const contractService = require("../services/contractService");
 
 exports.readContracts = async (req, res) => {
-    try {
-      (result = await contractService.getAllContracts()),
-
-        res.status(200);
-        res.json({
-        message: "contratos obtenidos correctamente",
-        count: result.length,
-        data: result,
-
-      });
-    } catch (error) {
-      console.error("Error al obtener contratos: " + error);
-      res.status(500);
-      res.json({ error: "Error al obtener contratos: " + error.message });
-    }
-  };
-
-exports.readNonOccupiedContracts = async (req, res) => {
-    try {
-      (result = await contractService.getAllNonOccuppiedContracts()),
-
-        res.status(200);
-        res.json({
-        message: "contratos libres obtenidos correctamente",
-        count: result.length,
-        data: result,
-
-      });
-    } catch (error) {
-      console.error("Error al obtener contratos libres: " + error);
-      res.status(500);
-      res.json({ error: "Error al obtener contratos librs: " + error.message });
-    }
-  };
-  
-  
-exports.readContractsByGerenteEmail = async (req, res) => {
   try {
-    let emailGerente = req.body;
-    (result = await contractService.getContractsByGerenteEmail(emailGerente)),
+    (result = await contractService.getAllContracts()),
+
       res.status(200);
     res.json({
-      message: `contratos obtenidos correctamnte`,
+      message: "contratos obtenidos correctamente",
       count: result.length,
       data: result,
+
     });
   } catch (error) {
+    console.error("Error al obtener contratos: " + error);
+    res.status(500);
+    res.json({ error: "Error al obtener contratos: " + error.message });
+  }
+};
+
+exports.readNonOccupiedContracts = async (req, res) => {
+  try {
+    (result = await contractService.getAllNonOccuppiedContracts()),
+
+      res.status(200);
+    res.json({
+      message: "contratos libres obtenidos correctamente",
+      count: result.length,
+      data: result,
+
+    });
+  } catch (error) {
+    console.error("Error al obtener contratos libres: " + error);
+    res.status(500);
+    res.json({ error: "Error al obtener contratos librs: " + error.message });
+  }
+};
+
+
+exports.readContractsByGerenteEmail = async (req, res) => {
+  try {
+
+    let emailGerente = req.params.emailgerente;
+
+    result = await contractService.getContractsByGerenteEmail(emailGerente);
+    res.status(200);
+    res.json({
+      message: `contratos obtenidos correctamnte`,
+      //count: result.length,
+      data: result,
+    });
+
+  } catch (error) {
     console.error(
-      `Error al obtener contratos para el gerente ${req.body.emailGerente} ` +
-        error
+      `Error al obtener contratos para el gerente ${req.params.emailGerente} ` +
+      error
     );
     res.status(500);
     res.json({
       error:
-        `Error al obtener contratos para el gerente ${req.body} ` +
+        `Error al obtener contratos para el gerente ${req.params.emailGerente} ` +
         error.message,
     });
   }
@@ -81,7 +84,7 @@ exports.updateContract = async (req, res) => {
     const contractUpdated = req.body;
     const id = req.params.id;
     const contrato = await contractService.updateContract(id, contractUpdated);
-    
+
     if (contrato.length === 0) {
       return res
         .status(404)
@@ -98,7 +101,51 @@ exports.updateContract = async (req, res) => {
       message: "Error al actualizar el contrato: " + error.message,
     });
     throw Error("ERROR 500");
-  
+
   }
 };
-  
+
+exports.asignarCandidato = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const emailPasante = req.body.pasante_email;
+
+    const contrato = await contractService.asignarCandidato(id, emailPasante);
+
+    res.status(200);
+    res.json({
+      message: `contrato actualizado con la asignación del pasante ${emailPasante}`,
+      data: contrato,
+    });
+  } catch (error) {
+    if (error.message === "NOT_FOUND") {
+      return res.status(404).json({
+        message: `No se encuentra un contrato con la id: ${req.params.id}`,
+      });
+    }
+    if (error.message === "OCCUPIED") {
+      return res.status(409).json({
+        message: "El contrato ya está ocupado. No se puede asignar un pasante.",
+      });
+    }
+    return res.status(500).json({
+      message: "Error al actualizar el contrato: " + error.message,
+    });
+  }
+};
+
+exports.deleteContract = async (req, res) => {
+  try {
+    let { id } = req.params;
+    result = await contractService.deleteContract(id)
+    res.status(201);
+    res.json({ message: 'contrato eliminado', id: result });
+
+  } catch (error) {
+    console.error('Error al eliminar contrato: ' + error);
+    res.status(500)
+    res.json({ error: 'Error al elimninar contrato: ' + error.message });
+  }
+}
+
+

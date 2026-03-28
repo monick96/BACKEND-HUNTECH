@@ -21,31 +21,35 @@ exports.getAllContractsRepository = async () => {
     }
   };
 
-  exports.getAllNotOcuppiedContractsRepository = async () => {
-    try {
-      let dbPool = await getPool();
-      const result = await dbPool.request().query(`
+exports.getAllNotOcuppiedContractsRepository = async () => {
+  let dbPool;
+  try {
+    dbPool = await getPool();
+    const result = await dbPool.request().query(`
               SELECT
                   *
               FROM
                   contrato
-                  where esta_ocupado = false
+                  where esta_ocupado = 0
               `);
-      return result;
-    } catch (error) {
-      console.error("REPOSITORY - Error al obtener contratos: " + error);
-      throw Error("Error al obtener Contratos: " + error.message);
-    } finally {
+    return result.recordset;
+  } catch (error) {
+    console.error("REPOSITORY - Error al obtener contratos: " + error);
+    throw Error("Error al obtener Contratos: " + error.message);
+  } finally {
+    if (dbPool) {
       dbPool.close();
     }
-  };
+  }
+};
 
-  exports.getContractsByGerenteEmail = async (emailGerente) => {
+exports.getContractsByGerenteEmailRepository = async (emailGerente) => {
+  let dbPool = await getPool();
   try {
-    let dbPool = await getPool();
+    
     const result = await dbPool
       .request()
-      .input("email", emailGerente.emailGerente) //agregue esto por que asi lo hacia gustavo y lei que es para evitar injeccion sql
+      .input("email", emailGerente) //agregue esto por que asi lo hacia gustavo y lei que es para evitar injeccion sql
       .query(`    
         SELECT
             *
@@ -62,14 +66,16 @@ exports.getAllContractsRepository = async () => {
                         p.email_gerente = @email
         )
     `);
-    return result;
+    
+    return result.recordset;
+    
   } catch (error) {
     console.error(
       "REPOSITORY - Error al obtener contratos por gerente: " + error
     );
     throw Error("Error al obtener Contratos: " + error.message);
   } finally {
-    //dbPool.close();
+    dbPool.close();
   }
 };
 
@@ -191,14 +197,6 @@ let queryActualizada = "UPDATE contrato SET ";
         
     return contratoActualizado.recordset[0];
 
-
-
-
-
-
-
-
-
     return updatedFields;
     //console.log("Results object:", results);  DA UNDEFINED Y NO SE PUEDE ARREGLAR A ESTA ALTURA CREO QUE ES ALGO DE AWS.
   } catch (error) {
@@ -209,4 +207,79 @@ let queryActualizada = "UPDATE contrato SET ";
   } finally {
     //dbPool.close();
   }
+};
+
+exports.asignarCandidatoRepository = async (id, emailPasante) => {
+  dbPool = await getPool();
+
+  try {
+    //Checkeo si el contrato ya esta tomado
+    const checkRequest = dbPool.request()
+      .input("id", sql.Int, id);
+
+    const checkQuery = `
+      SELECT esta_ocupado 
+      FROM contrato 
+      WHERE id = @id
+    `;
+
+    const checkResult = await checkRequest.query(checkQuery);
+
+    if (checkResult.recordset.length === 0) {
+      return { notFound: true };
+    }
+
+    if (checkResult.recordset[0].esta_ocupado === true) {
+      return { alreadyOccupied: true };
+    }
+    //Si no esta tomado continuo a actualizarlo
+    const request = dbPool.request()
+      .input("id", sql.Int, id)
+      .input("esta_ocupado", sql.Bit, 1)
+      .input("pasante_email", sql.VarChar, emailPasante);
+
+    const query = `
+      UPDATE contrato
+      SET 
+        esta_ocupado = @esta_ocupado,
+        pasante_email = @pasante_email
+      OUTPUT INSERTED.*
+      WHERE id = @id
+    `;
+
+    const result = await request.query(query);
+    return result.recordset[0];
+
+  } catch (error) {
+    console.log(` Error en SQL REPOSITORY - asignarCandidatoRepository - ${error}`);
+    throw error;
+  }
+};
+
+
+
+exports.deleteContractRepository = async (id) => {
+
+  let dbPool = await getPool();
+
+  try {
+    const query = `
+            DELETE
+            FROM
+                contrato
+            WHERE
+                id = @id
+        `;
+    await dbPool.request().input("id",  sql.Int, id).query(query);
+
+    return id;
+  } catch (error) {
+
+    console.error("REPOSITORY - Error al eliminar contrato: " + error.message);
+    throw Error(error.message);
+
+  }finally {
+    dbPool.close();
+  } 
+
 };
