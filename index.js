@@ -42,4 +42,5 @@ app.use('/api', routerUsuario)
 app.listen(PORT,HOSTNAME, () =>console.log(`El servidor esta corriendo en http://${HOSTNAME}:${PORT}/api`));
 
 //exporta la app para serverless
-module.exports.handler = serverless(app);
+module.exports.handler = serverless(app);//para aws
+module.exports = app;//para vercel
