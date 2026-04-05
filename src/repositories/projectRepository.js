@@ -1,13 +1,13 @@
-const { info } = require("console");
-const getPool = require("../dataBase/conexionSQL");
+//const getPool = require("../dataBase/conexionSQL");
 const crypto = require('crypto');
-const sql = require("mssql");
+//const sql = require("mssql");
+const pool = require("../dataBase/conexionPostgres");
 
 exports.chequearSiExisteProyectoConEmail = async (proyecto) => {
-  let dbPool = await getPool();
+  //let dbPool = await getPool();
   try {
     //console.log('REPOSITORIO proyecto: ', proyecto)
-    const query = `
+    /*const query = `
             SELECT CASE
             WHEN
                 EXISTS (SELECT 1 FROM proyecto WHERE email_gerente = @email_gerente)
@@ -18,27 +18,40 @@ exports.chequearSiExisteProyectoConEmail = async (proyecto) => {
       .request()
       .input("email_gerente", proyecto.email_gerente)
       .query(query);
-    return result.recordset[0].existe;
+    return result.recordset[0].existe;*/
+
+    const query = `
+      SELECT
+          EXISTS (SELECT 1 FROM proyecto WHERE email_gerente = $1);
+    `;
+    const values = [proyecto.email_gerente]
+
+    const result = await pool.query(query, values);
+
+    return result.rows[0].exists;
+
+
   } catch (error) {
+
     console.error(
       "REPOSITORY - Error al chequear si existen proyectos asociados a un gerente con ese email: " +
         error
     );
 
-    throw Error( error.message);}
-    
-  finally {
+    throw Error( error.message);
+
+  }finally {
         
-    dbPool.close();
+    //dbPool.close();
 
   } 
 };
 
 exports.createProyectRepository = async (project) => {
-    dbPool = await getPool();
+    //dbPool = await getPool();
     try {
         let id = crypto.randomUUID();//id random con libreria incluida en node
-        const query = `
+        /*const query = `
             INSERT INTO 
             proyecto (id, nombre, description, info_link, 
             buscando_devs, id_gerente, email_gerente)
@@ -67,15 +80,34 @@ exports.createProyectRepository = async (project) => {
             .input('id_gerente', project.id_gerente || '')
             .input('email_gerente', project.email_gerente)
             .query(query);
-        return id;
-        
+        return id;*/
+
+        const query = `
+            INSERT INTO 
+            proyecto (id, nombre, description, info_link, 
+            buscando_devs, id_gerente, email_gerente)
+            VALUES ( $1, $2, $3, $4, $5, $6, $7 )
+            RETURNING id;
+        `;
+
+        const values = [
+          id, project.nombre, project.description, project.info_link,
+          project.buscando_devs, project.id_gerente, project.email_gerente
+        ];
+
+        const result = await pool.query(
+            query, values
+        );
+
+        return result.rows[0].id; //retornar id de ptoyecto creada
+
     } catch (error) {
         console.error('REPOSITORY - Error al crear proyecto: ' + error.message);
         throw Error(error.message);
 
     } finally {  
 
-        dbPool.close(); // cerrar conexion al terminar la operacion
+       // dbPool.close(); // cerrar conexion al terminar la operacion
 
     } 
     
@@ -83,22 +115,33 @@ exports.createProyectRepository = async (project) => {
 
 exports.getAllProjectsRepository = async () => {
         //dos metodos async: esperar al get pool y a la  respuesta de la query
-        let dbPool = await getPool();
+        //let dbPool = await getPool();
     try {
         //las querys deberian ir en sqlQuery
-        const result = await dbPool.request().query(
+        /*const result = await dbPool.request().query(
             `SELECT *
         FROM   proyecto
         `
         );
         console.log(result.recordset)
-        return result.recordset;
+        return result.recordset;*/
+
+        const result = await pool.query(
+            `SELECT *
+              FROM   proyecto
+          `
+        );
+
+        return result.rows
+
 
     } catch (error) {
+
         console.error('REPOSITORY - Error al obtener proyectos: ' + error);
         throw Error('Error al obtener Proyectos: ' + error.message);
+
     } finally {
-        dbPool.close(); // cerrar conexion al terminar la operacion
+        //dbPool.close(); // cerrar conexion al terminar la operacion
     } 
 }
 

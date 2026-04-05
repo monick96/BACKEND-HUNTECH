@@ -10,7 +10,8 @@ exports.createproject = async (req, res) => {
 
     const elGerenteYaTieneProyecto = await projectService.chequearSiExisteProyectoConEmail(project)
 
-    if (elGerenteYaTieneProyecto == 1) {
+    //if (elGerenteYaTieneProyecto == 1) {//para aws sql
+    if (elGerenteYaTieneProyecto == true) {//postgres que maneja booleanos
       return res.status(400).json({ message: 'El gerente ya tiene un proyecto. Cada gerente puede poseer solo un proyecto' });
     }
 
@@ -18,6 +19,7 @@ exports.createproject = async (req, res) => {
     result = await projectService.createProject(project);
     res.status(201);
     res.json({ message: "proyecto creado", projectId: result });
+
   } catch (error) {
     console.error("Error al crear proyecto: " + error);
     res.status(500);
