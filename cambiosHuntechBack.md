@@ -86,3 +86,4 @@ node index.js
 tener corriendo el proyecto y probar ruta getcarreras y crear carrera desde postman(probado ok)
 
 - comente el codigo usado para sql, no lo borre por si acaso
+- si supabase no detecta actividad en la db en 7 dias, lo pausa y se nos cae la db.. tengo que entrar y activarlo de nuevo.Tarda lo suyo en levantarlo de nuevo, unos 15 minutos.

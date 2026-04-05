@@ -31,6 +31,8 @@ exports.createCareerDev = async (careerDev) => {
         // Llamada al repository
         const result = await careerDevRepository.createCareerDevRepository(careerDev);
         
+        return result;
+        
     } catch (error) {
 
         console.error('SERVICE - Error al crear carrera por desarrollador: ' + error);

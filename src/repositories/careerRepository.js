@@ -1,8 +1,6 @@
-const getPool = require("../dataBase/conexionSQL");
+//const getPool = require("../dataBase/conexionSQL");
 const pool = require("../dataBase/conexionPostgres");
-const crypto = require('crypto');
-const { postMessageToThread } = require("worker_threads");
-
+//const crypto = require('crypto');
 
 exports.getAllCareersRepository = async () => {
     try {
@@ -64,12 +62,7 @@ exports.createCareerRepository = async (career) => {
         const query = `
             INSERT INTO 
             carrera (nombre, info_link, status, id_institucion_educativa)
-            VALUES (
-                $1, 
-                $2, 
-                $3, 
-                $4
-            )
+            VALUES ($1, $2, $3, $4)
             RETURNING id;
         `;//retorna id de la carrera creada
 
