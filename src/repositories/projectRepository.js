@@ -147,11 +147,11 @@ exports.getAllProjectsRepository = async () => {
 
 exports.getProyectoByEmailRepository = async (email_gerente) => {
 
-  let dbPool = await getPool();
+ // let dbPool = await getPool();
 
   try {
 
-    const query = `
+    /*const query = `
             SELECT
                 *
             FROM
@@ -163,17 +163,36 @@ exports.getProyectoByEmailRepository = async (email_gerente) => {
       .request()
       .input("email_gerente", sql.VarChar, email_gerente)
       .query(query);
-    return result.recordset;
+    return result.recordset;*/
+    
+    const query = `
+      SELECT
+          *
+      FROM
+          proyecto
+      WHERE
+          proyecto.email_gerente = $1
+    `;
+
+    const values = [email_gerente];
+
+    const result = await pool.query(
+      query, values
+    );
+
+    return result.rows;
+
   } catch (error) {
 
     console.error(
       "REPOSITORY - Error al obtener el proyecto solicitado: " + error
     );
+
     throw Error(error.message);
 
   } finally {
 
-    dbPool.close(); // cerrar conexion al terminar la operacion
+    //dbPool.close(); // cerrar conexion al terminar la operacion
 
   }
 };
@@ -234,10 +253,10 @@ exports.updateProjectRepository = async (email_gerente, projectUpdated) => {
 
 exports.deleteProjectRepository = async (email_gerente) => {
 
-  let dbPool = await getPool();
+  //let dbPool = await getPool();
 
   try {
-    const query = `
+   /* const query = `
             DELETE
             FROM
                 proyecto
@@ -246,14 +265,32 @@ exports.deleteProjectRepository = async (email_gerente) => {
         `;
     await dbPool.request().input("email_gerente",  sql.VarChar, email_gerente).query(query);
 
-    return email_gerente;
+    return email_gerente;*/
+
+    const query = `
+        DELETE
+        FROM
+            proyecto
+        WHERE
+            email_gerente = $1
+        RETURNING email_gerente;
+    `;
+
+    const values = [email_gerente];
+
+    const result = await pool.query(
+      query, values
+    );
+
+    return result.rows[0].email_gerente;
+
   } catch (error) {
 
     console.error("REPOSITORY - Error al eliminar proyecto: " + error.message);
     throw Error(error.message);
 
   }finally {
-    dbPool.close();
+    //dbPool.close();
   } 
 
 };

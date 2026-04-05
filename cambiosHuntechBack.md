@@ -87,4 +87,9 @@ tener corriendo el proyecto y probar ruta getcarreras y crear carrera desde post
 
 - comente el codigo usado para sql, no lo borre por si acaso
 - si supabase no detecta actividad en la db en 7 dias, lo pausa y se nos cae la db.. tengo que entrar y activarlo de nuevo.Tarda lo suyo en levantarlo de nuevo, unos 15 minutos.
+- segun la web de supabase si llegamos a usar los 500 mb , deberiamos pasarnos al plan pago por 25 usd al mes y nos dan:
+  - 8 GB de almacenamiento de base de datos (en lugar de los 500 MB iniciales).
+  - 100 GB de File Storage (para imágenes, PDFs, etc.).
+  - 250 GB de transferencia de datos.
+  - Backups diarios con retención de 7 días.
 - 
