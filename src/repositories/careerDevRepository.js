@@ -48,7 +48,7 @@ exports.createCareerDevRepository = async (careerDev) => {
         const query = `
             INSERT INTO carrera_x_desarrollador 
             (id_desarrollador, id_carrera, start_date, end_date, isvalidated)
-            VALUES ($1, $2, $3, $4, $5)
+            VALUES ($1, $2, $3, $4, $5);
         `;
 
         //valores en orden segun la query
