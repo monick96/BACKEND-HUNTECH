@@ -209,6 +209,8 @@ exports.updateProjectRepository = async (email_gerente, projectUpdated) => {
 
   
   try {
+
+    /*
     dbPool = await getPool();
     const requestUpdated = dbPool.request().input("email_gerente", sql.VarChar, email_gerente);
 
@@ -230,7 +232,7 @@ exports.updateProjectRepository = async (email_gerente, projectUpdated) => {
     //if (email_gerente != null) queryActualizada += "email_gerente = @email_gerente, ";
     
     /* esto que sigue borra espacios al principio y al final (trim) y luego elimina comas al final ($ aquí significa al final). */
-    queryActualizada = queryActualizada.trim().replace(/,$/, "");
+    /*queryActualizada = queryActualizada.trim().replace(/,$/, "");
     queryActualizada += " OUTPUT INSERTED.* WHERE email_gerente = @email_gerente";
     
     //console.log(requestUpdated)
@@ -239,11 +241,107 @@ exports.updateProjectRepository = async (email_gerente, projectUpdated) => {
     let proyectoActualizado = await requestUpdated.query(queryActualizada);
     
     console.log(proyectoActualizado)
-    return proyectoActualizado.recordset[0];
+    return proyectoActualizado.recordset[0];*/
+
+    let setClauses = []; //guardamos los textos (nombre = $1)
+    let values = []; //los valores que recibimos
+    let paramIndex = 1; //contador que sube indicando cuantos parametros y ubicaciones actualizaremos
+
+    if (nombre != null) {
+      // guardamos usando el valor del contador
+      setClauses.push(`nombre = $${paramIndex}`); //ej: nombre = $1
+      
+      //guardamos el valor recibido
+      values.push(nombre);// ej: "Matecito 2.0"
+      
+      //subimos contador 
+      paramIndex++;// Ahora paramIndex vale 2
+    }
+
+    if (description != null) {
+      // guardamos usando el valor del contador
+      setClauses.push(`description = $${paramIndex}`);//$num
+      
+      //guardamos el valor recibido
+      values.push(description);
+      
+      //subimos contador 
+      paramIndex++;
+    }
+
+    if (info_link != null) {
+      // guardamos usando el valor del contador
+      setClauses.push(`info_link = $${paramIndex}`);//$num
+      
+      //guardamos el valor recibido
+      values.push(info_link);
+      
+      //subimos contador 
+      paramIndex++;
+    }
+
+    if (buscando_devs != null) {
+      // guardamos usando el valor del contador
+      setClauses.push(`buscando_devs = $${paramIndex}`);//$num
+      
+      //guardamos el valor recibido
+      values.push(buscando_devs);
+      
+      //subimos contador 
+      paramIndex++;
+    }
+
+    if (contratos != null) {
+      // guardamos usando el valor del contador
+      setClauses.push(`contratos = $${paramIndex}`);//$num
+      
+      //guardamos el valor recibido
+      values.push(contratos);
+      
+      //subimos contador 
+      paramIndex++;
+    }
+
+    if (id_gerente != null) {
+      // guardamos usando el valor del contador
+      setClauses.push(`id_gerente = $${paramIndex}`);//$num
+      
+      //guardamos el valor recibido
+      values.push(id_gerente);
+      
+      //subimos contador 
+      paramIndex++;
+    }
+
+    if (setClauses.length === 0) {
+      return null; 
+    }
+
+    if (email_gerente != null) {
+      //guardamos el valor recibido
+      //este es un valor que usamos para encontrar el proyecto no va en clausulas
+      values.push(email_gerente);
+    }
+
+    // queda tipo: "UPDATE proyecto SET nombre = $1, description = $2 "
+    let query = `UPDATE proyecto SET ${setClauses.join(', ')} `;
+
+    //el email siempre va ir al final asi que es el paraindex en posicion actual
+    query += ` 
+      WHERE 
+       proyecto.email_gerente = $${paramIndex}
+      RETURNING *
+    `;
+
+    const result = await pool.query(
+      query, values
+    );
+
+    return result.rows[0];
 
   } catch (error) {
     console.log(
-     `Error en SQL REPOSITORY - updateProjectRepository - ${error}`
+     `Error en Postgres REPOSITORY - updateProjectRepository - ${error}`
     );
     throw error;
   } finally {
@@ -276,7 +374,7 @@ exports.deleteProjectRepository = async (email_gerente) => {
         RETURNING email_gerente;
     `;
 
-    const values = [email_gerente];
+    const values = [email_gerente];//aunque sea un valor debe ir en forma de lista
 
     const result = await pool.query(
       query, values
