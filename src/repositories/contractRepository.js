@@ -339,10 +339,10 @@ exports.asignarCandidatoRepository = async (id, emailPasante) => {
 
 exports.deleteContractRepository = async (id) => {
 
-  let dbPool = await getPool();
+  //let dbPool = await getPool();
 
   try {
-    const query = `
+    /*const query = `
             DELETE
             FROM
                 contrato
@@ -350,15 +350,32 @@ exports.deleteContractRepository = async (id) => {
                 id = @id
         `;
     await dbPool.request().input("id",  sql.Int, id).query(query);
+    
+    return id;*/
 
-    return id;
+    const query = `
+        DELETE
+        FROM
+            contrato
+        WHERE
+            id = $1
+        RETURNING id;
+    `;
+    
+    const values = [id];
+
+    const result = await pool.query(query, values);
+
+    // si borro devolvemos el id,si no null.
+    return result.rows.length > 0 ? result.rows[0].id : null;
+
   } catch (error) {
 
     console.error("REPOSITORY - Error al eliminar contrato: " + error.message);
     throw Error(error.message);
 
   }finally {
-    dbPool.close();
+   // dbPool.close();
   } 
 
 };
