@@ -289,11 +289,11 @@ let queryActualizada = "UPDATE contrato SET ";
 };
 
 exports.asignarCandidatoRepository = async (id, emailPasante) => {
-  dbPool = await getPool();
+  //dbPool = await getPool();
 
   try {
     //Checkeo si el contrato ya esta tomado
-    const checkRequest = dbPool.request()
+   /* const checkRequest = dbPool.request()
       .input("id", sql.Int, id);
 
     const checkQuery = `
@@ -327,7 +327,40 @@ exports.asignarCandidatoRepository = async (id, emailPasante) => {
     `;
 
     const result = await request.query(query);
-    return result.recordset[0];
+    return result.recordset[0];*/
+    //Checkeo si el contrato ya esta tomado
+    const checkQuery = `
+      SELECT esta_ocupado 
+      FROM contrato 
+      WHERE id = $1
+    `;
+
+    const valuesCheck = [];
+
+    const resultCheck = await pool.query(checkQuery, valuesCheck);
+
+     if (resultCheck.rows.length === 0) {
+      return { notFound: true };
+    }
+
+    if (resultCheck.rows[0].esta_ocupado === true) {
+      return { alreadyOccupied: true };
+    }
+    //Si no esta tomado continuo a actualizarlo
+    const query = `
+      UPDATE contrato
+      SET 
+        esta_ocupado = $1,
+        pasante_email = $2
+      WHERE id = $3
+      RETURNING *;
+    `;
+
+    const values = [true, emailPasante, id];
+
+    const result = await pool.query(query, values);
+
+    return result.rows[0];
 
   } catch (error) {
     console.log(` Error en SQL REPOSITORY - asignarCandidatoRepository - ${error}`);
