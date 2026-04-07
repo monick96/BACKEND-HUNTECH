@@ -1,30 +1,45 @@
 
-const getPool = require("../dataBase/conexionSQL");
-const sql = require('mssql');
+//const getPool = require("../dataBase/conexionSQL");
+//const sql = require('mssql');
+const pool = require("../dataBase/conexionPostgres");
 
 exports.getAllContractsRepository = async () => {
-    let dbPool = await getPool();
-    try {
-      const result = await dbPool.request().query(`
-              SELECT
-                  *
-              FROM
-                  contrato
-              `);
-              
-      return result.recordset;
-    } catch (error) {
-      console.error("REPOSITORY - Error al obtener contratos: " + error);
-      throw Error("Error al obtener Contratos: " + error.message);
-    } finally {
-      dbPool.close();
-    }
-  };
+  //let dbPool = await getPool();
+  try {
+    /*
+    const result = await dbPool.request().query(`
+            SELECT
+                *
+            FROM
+                contrato
+            `);
+            
+    return result.recordset;*/
+
+    const result = await pool.query(
+      `SELECT
+        *
+        FROM
+        contrato
+      `
+    );
+
+    return result.rows;
+
+  } catch (error) {
+
+    console.error("REPOSITORY - Error al obtener contratos: " + error);
+    throw Error("Error al obtener Contratos: " + error.message);
+
+  } finally {
+    //dbPool.close();
+  }
+};
 
 exports.getAllNotOcuppiedContractsRepository = async () => {
-  let dbPool;
+  //let dbPool;
   try {
-    dbPool = await getPool();
+    /*dbPool = await getPool();
     const result = await dbPool.request().query(`
               SELECT
                   *
@@ -32,22 +47,38 @@ exports.getAllNotOcuppiedContractsRepository = async () => {
                   contrato
                   where esta_ocupado = 0
               `);
-    return result.recordset;
+    return result.recordset;*/
+    const result = await pool.query(`
+      SELECT
+          *
+      FROM
+          contrato
+          where esta_ocupado = false
+    `);
+
+    return result.rows;
+
+
   } catch (error) {
+
     console.error("REPOSITORY - Error al obtener contratos: " + error);
     throw Error("Error al obtener Contratos: " + error.message);
+
   } finally {
-    if (dbPool) {
+
+    /*if (dbPool) {
       dbPool.close();
-    }
+    }*/
+
   }
+
 };
 
 exports.getContractsByGerenteEmailRepository = async (emailGerente) => {
-  let dbPool = await getPool();
+  //let dbPool = await getPool();
   try {
     
-    const result = await dbPool
+    /*const result = await dbPool
       .request()
       .input("email", emailGerente) //agregue esto por que asi lo hacia gustavo y lei que es para evitar injeccion sql
       .query(`    
@@ -67,21 +98,46 @@ exports.getContractsByGerenteEmailRepository = async (emailGerente) => {
         )
     `);
     
-    return result.recordset;
+    return result.recordset;*/
+
+    const query =  `    
+      SELECT
+        *
+      FROM
+        contrato c
+      WHERE
+        c.proyecto_id
+          IN (
+            SELECT
+                id
+            FROM
+                proyecto p
+            WHERE
+                p.email_gerente = $1
+          );
+    `;
+
+    const values = [emailGerente];
+    
+    const result = await pool.query(query, values);
+
+    return result.rows;
     
   } catch (error) {
+
     console.error(
       "REPOSITORY - Error al obtener contratos por gerente: " + error
     );
     throw Error("Error al obtener Contratos: " + error.message);
+
   } finally {
-    dbPool.close();
+    //dbPool.close();
   }
 };
 
 exports.createContractRepository = async (contract) => {
   try {
-    dbPool = await getPool();
+    /*dbPool = await getPool();
     let id = crypto.randomUUID();
 
     const query = `
@@ -106,10 +162,33 @@ exports.createContractRepository = async (contract) => {
       .input("start_date", contract.start_date || "")
       .input("end_date", contract.end_date || "")
       .query(query);
-    return id;
+    return id;*/
+
+    const query = `
+        INSERT INTO
+          contrato
+            (tipo, titulo, descripcion, tiene_postulaciones, postulaciones, esta_ocupado, pasante_email, proyecto_id, start_date, end_date)
+        VALUES
+            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+        RETURNING id
+    `;
+
+    const values = [contract.tipo, contract.titulo, contract.descripcion ||'', contract.tiene_postulaciones,
+      contract.postulaciones || '', contract.esta_ocupado,  contract.pasante_email || '',  contract.proyecto_id,
+      contract.start_date || '', contract.end_date || ''
+    ];
+
+    const result = await pool.query(query, values);
+
+    return result.rows[0].id; 
+
+
+
   } catch (error) {
+
     console.error("REPOSITORY - Error al crear contrato: " + error.message);
     throw Error("Error al crear contrato: " + error.message);
+
   } finally {
     //dbPool.close();
   }
