@@ -380,7 +380,7 @@ exports.updateContractRepository = async (id, contractUpdated) => {
     console.log(
       `Error en SQL REPOSITORY - updateContractRepository - ${error}`
     );
-    
+
     throw error;
 
   } finally {
@@ -435,7 +435,7 @@ exports.asignarCandidatoRepository = async (id, emailPasante) => {
       WHERE id = $1
     `;
 
-    const valuesCheck = [];
+    const valuesCheck = [id];
 
     const resultCheck = await pool.query(checkQuery, valuesCheck);
 
@@ -512,3 +512,5 @@ exports.deleteContractRepository = async (id) => {
   } 
 
 };
+
+//falta metodo get contrato por id 
