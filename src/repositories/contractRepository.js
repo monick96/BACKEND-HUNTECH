@@ -208,10 +208,10 @@ exports.updateContractRepository = async (id, contractUpdated) => {
     end_date,
   } = contractUpdated;
 
-  dbPool = await getPool();
+  //dbPool = await getPool();
 
   try {
-    const requestUpdated = dbPool.request().input("id", sql.Int, id);
+    /*const requestUpdated = dbPool.request().input("id", sql.Int, id);
     if (tipo != null) requestUpdated.input("tipo", sql.VarChar, tipo);
     if (titulo != null) requestUpdated.input("titulo", sql.VarChar, titulo);
     if (descripcion != null)
@@ -220,7 +220,7 @@ exports.updateContractRepository = async (id, contractUpdated) => {
       requestUpdated.input("tiene_postulaciones", sql.Bit, tiene_postulaciones);
     /* OJO este que sigue toma uno o varios strings, los procesa y los agrega
   */  
-    if (postulaciones != null) {
+    /*if (postulaciones != null) {
       let newPostulaciones = ","+postulaciones
       //const postulacionesStr = Array.isArray(postulaciones) ? postulaciones.join(',') : postulaciones;
       requestUpdated.input("postulaciones", sql.VarChar, newPostulaciones)
@@ -237,36 +237,36 @@ exports.updateContractRepository = async (id, contractUpdated) => {
     if (end_date != null)
       requestUpdated.input("end_date", sql.VarChar, end_date);
 
-let queryActualizada = "UPDATE contrato SET ";
+    let queryActualizada = "UPDATE contrato SET ";
     if (tipo != null) queryActualizada += "tipo = @tipo, ";
     if (titulo != null) queryActualizada += "titulo = @titulo, ";
     if (descripcion != null) queryActualizada += "descripcion = @descripcion, ";
     /* esta debería ser semi automática: la primera vez que alguien se postula, pasaría a 1, y luego ya queda así */
-    if (tiene_postulaciones != null)
+   /*if (tiene_postulaciones != null)
       queryActualizada += "tiene_postulaciones = @tiene_postulaciones, ";
       /* Postulaciones es un falso array de strings que armamos como una especie de csv manual (email1,email2,email3) entonces al updatear este
      campo enviando un mail, ese email tiene que sumarse a la "lista". OJO: antes de habilitar este método hay que hacer algún GET que , si ya estás posultado, no te deje hacerlo (se puede hacer facilmente
     desde el componente contratos del front)
     IMPORTANTE: ESTE CAMPO TIENE QUE IR ACA ABAJO PARA NO ROMPER TODO POR EL TEMA DE LA COMA QUE METE EN EL MEDIO  */  
     
-    if (postulaciones != null) {
+   /* if (postulaciones != null) {
       queryActualizada +=
     `postulaciones += @postulaciones`;
     }
       
     /* estas dos que siguen deberían usarse una sola vez */
-    if (esta_ocupado != null)
+    /*if (esta_ocupado != null)
       queryActualizada += "esta_ocupado = @esta_ocupado, ";
     if (pasante_email != null)
       queryActualizada += "pasante_email = @pasante_email, ";
     /* esta no debería usarse nunca: */
-    if (proyecto_id != null) queryActualizada += "proyecto_id = @proyecto_id, ";
+    /*if (proyecto_id != null) queryActualizada += "proyecto_id = @proyecto_id, ";
     if (start_date != null) queryActualizada += "start_date = @start_date, ";
     if (end_date != null) queryActualizada += "end_date = @end_date, ";
   
 
     /* esto que sigue borra espacios al principio y al final (trim) y luego elimina comas al final ($ aquí significa al final). */
-    queryActualizada = queryActualizada.trim().replace(/,$/, "");
+   /* queryActualizada = queryActualizada.trim().replace(/,$/, "");
     queryActualizada += " OUTPUT INSERTED.* WHERE id = @id";
 
     //console.log(requestUpdated)
@@ -276,13 +276,113 @@ let queryActualizada = "UPDATE contrato SET ";
         
     return contratoActualizado.recordset[0];
 
-    return updatedFields;
+    return updatedFields;*/
     //console.log("Results object:", results);  DA UNDEFINED Y NO SE PUEDE ARREGLAR A ESTA ALTURA CREO QUE ES ALGO DE AWS.
+    
+    let setClauses = []; //guardamos los textos (ej tipo = $1)
+    let values = []; //los valores que recibimos
+    let paramIndex = 1; //contador que sube indicando cuantos parametros y ubicaciones actualizaremos
+
+    if (tipo != null){
+      // guardamos usando el valor del contador
+      setClauses.push(`tipo = $${paramIndex}`);//$num
+      
+      //guardamos el valor recibido
+      values.push(tipo);
+      
+      //subimos contador 
+      paramIndex++;
+    }
+
+    if (titulo != null){
+     
+      setClauses.push(`titulo = $${paramIndex}`);//$num
+    
+      values.push(titulo);
+ 
+      paramIndex++;
+    }
+
+    if (descripcion != null){
+
+      setClauses.push(`descripcion = $${paramIndex}`);//$num
+     
+      values.push(descripcion);
+   
+      paramIndex++;
+    }
+
+    if (tiene_postulaciones != null){
+      
+      setClauses.push(`tiene_postulaciones = $${paramIndex}`);//$num
+     
+      values.push(tiene_postulaciones);
+   
+      paramIndex++;
+
+    }
+
+    if (postulaciones != null) {
+      // en postgres, para concatenar strings usamos ||
+      // debe quedar: postulaciones = postulaciones || ',' || $5//habra que probar
+      setClauses.push(`postulaciones = postulaciones || ',' || $${paramIndex}`);
+
+      values.push(postulaciones);
+
+      paramIndex++;
+    }
+
+    if (proyecto_id != null) {
+
+      setClauses.push(`proyecto_id = $${paramIndex}`);
+
+      values.push(proyecto_id);
+
+      paramIndex++;
+    }
+
+    if (start_date != null) {
+
+      setClauses.push(`start_date = $${paramIndex}`);
+
+      values.push(start_date);
+
+      paramIndex++;
+    }
+
+    if (end_date != null) {
+
+      setClauses.push(`end_date = $${paramIndex}`);
+      
+      values.push(end_date);
+
+      paramIndex++;
+    }
+
+    if (setClauses.length === 0) return null;
+
+    // id al final para el WHERE
+    values.push(id);
+
+    // queda tipo: "UPDATE contrato SET tipo = $1, titulo = $2 "
+    const query = `
+      UPDATE contrato 
+      SET ${setClauses.join(', ')} 
+      WHERE id = $${paramIndex} 
+      RETURNING *;
+    `;
+
+    const result = await pool.query(query, values);
+    return result.rows[0];
+
   } catch (error) {
+
     console.log(
       `Error en SQL REPOSITORY - updateContractRepository - ${error}`
     );
+    
     throw error;
+
   } finally {
     //dbPool.close();
   }

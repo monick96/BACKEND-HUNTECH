@@ -64,7 +64,7 @@ exports.createCareerDevRepository = async (careerDev) => {
             query,values
         );
 
-       return `${careerDev.id_desarrollador}_${careerDev.id_carrera}`;; //retornar id de carrera_Desarrollador creada
+       return `${careerDev.id_desarrollador}_${careerDev.id_carrera}`; //retornar id de carrera_Desarrollador creada
 
 
 
