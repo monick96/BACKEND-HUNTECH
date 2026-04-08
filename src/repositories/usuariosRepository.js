@@ -2,8 +2,8 @@
 ni se va a crear nada llamado usuarios. Pero en términos conceptuales (o en POO), tenemos 3 subtipos de usuarios:
 desarrolladores, gerentes, e instituciones educativas. la idea es que este flujo se encargue del CRUD de los 3 */
 
-const getPool = require("../dataBase/conexionSQL");
-const sql = require('mssql');
+//const getPool = require("../dataBase/conexionSQL");
+//const sql = require('mssql');
 const crypto = require('crypto');
 const { TABLAS_PERMITIDAS } = require("../utils/constants");
 
