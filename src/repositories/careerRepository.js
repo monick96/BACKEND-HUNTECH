@@ -1,22 +1,7 @@
-//const getPool = require("../dataBase/conexionSQL");
 const pool = require("../dataBase/conexionPostgres");
-//const crypto = require('crypto');
 
 exports.getAllCareersRepository = async () => {
     try {
-
-        //dos metodos async
-       /* let dbPool = await getPool();
-        
-        //las querys deberian ir en sqlQuery
-        const result = await dbPool.request().query(
-            `SELECT *
-        FROM   carrera
-        `
-        );
-        
-        return result;*/
-        //postgres
 
         const result = await pool.query(
             `SELECT * FROM   carrera`
@@ -36,29 +21,6 @@ exports.getAllCareersRepository = async () => {
 exports.createCareerRepository = async (career) => {
     try {
 
-        /*dbPool = await getPool();
-
-        const query = `
-            INSERT INTO 
-            dbo.carrera (nombre, info_link, status, id_institucion_educativa)
-            VALUES (
-                @nombre, 
-                @info_link, 
-                @status, 
-                @id_institucion_educativa
-            )
-        `;
-
-        await dbPool.request()
-            .input('nombre', career.nombre)
-            .input('id_institucion_educativa', career.id_institucion_educativa)
-            .input('info_link', career.info_link || '')
-            .input('status', career.status || 1)
-
-            .query(query);
-            
-        return id;*/
-        //postgres
         const query = `
             INSERT INTO 
             carrera (nombre, info_link, status, id_institucion_educativa)
@@ -88,11 +50,6 @@ exports.createCareerRepository = async (career) => {
 
         throw Error('Error al crear carrera: ' + error.message);
     
-    }finally {
-        
-        //dbPool.close(); // cerrar conexion al terminar la operacion
-        //no requiere finally
-
-    } 
+    }
 
 }
