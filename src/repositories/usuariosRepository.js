@@ -434,61 +434,23 @@ exports.deleteDesarrolladorRepository = async (desarrollador) => {
 
 //actualiza desarrollador por email y retorna todo el objeto actualizado
 /* MÉTODO DEPRECADO AHORA RUTIAMOS TODOS LOS PUT DE USUARIO POR EL MÉTODO GENÉRICO DE USUARIO */
+//lo migro y dejo por si en alguna parte se sigue usando
 exports.updateDesarrolladorByEmailRepository = async (email, desarrollador) => {
-  let dbPool = await getPool();
-
   try {
-    let { nombre, descripcion, skills } = desarrollador;
 
-    let request = dbPool.request().input('email', sql.VarChar, email);
-
-    if (nombre != null) { request.input('nombre', sql.VarChar, nombre); }
-    if (descripcion != null) { request.input('descripcion', sql.VarChar, descripcion); }
-
-    let query = `UPDATE dbo.desarrollador SET `;
-    if (nombre != null) { query += `nombre = @nombre, `; }
-
-    if (skills != null) {
-      const skillsStr = Array.isArray(skills) ? skills.join(',') : skills;
-      request.input('skills', sql.VarChar, skillsStr);
-      query += `skills = @skills, `;
-    }
-
-    if (descripcion != null) { query += `descripcion = @descripcion, `; }
-
-    query = query.trim().replace(/,$/, "")
-    query += ' OUTPUT INSERTED.* ';
-    query += ' WHERE email = @email'
-
-
-    let result = await request.query(query);
-
-    /*let updatedFields= [];
-
-    for (let name in request.parameters)
-    {
-        if (name != "id")updatedFields.push(name)
-    };*/
-
-    //return updatedFields; //ahora devuelve los campos que se actualizaron
-
-    return result.recordset[0];
+    return await this.updateUsuarioByEmailRepository(email, { ...desarrollador, rol: "desarrollador" });
 
   } catch (error) {
 
     console.error("REPOSITORY - Error al actualiza desarrollador: " + error.message);
     throw Error("Error al actualizar desarrollador: " + error.message);
 
-  } finally {
-
-    dbPool.close();
-
   }
 };
 
 //objeto usuario con email y nombre de la tabla
 exports.getUserByEmailRepository = async (email, tabla) => {
-  let dbPool = await getPool();
+ 
 
   try {
 
@@ -496,20 +458,13 @@ exports.getUserByEmailRepository = async (email, tabla) => {
       throw Error('Tabla no permitida');
     }
 
-    const query = `
-            SELECT
-                *
-            FROM
-                ${tabla}
-            WHERE
-              ${tabla}.email = @email
-            `;
-    const result = await dbPool
-      .request()
-      .input("email", sql.VarChar, email)
-      .query(query);
+    const query = `SELECT * FROM ${tabla} WHERE email = $1`;
 
-    return result.recordset[0];
+    const values = [email];
+
+    const result = await pool.query(query, values);
+
+    return result.rows[0];;
 
   } catch (error) {
 
@@ -519,60 +474,52 @@ exports.getUserByEmailRepository = async (email, tabla) => {
 
     throw Error(error.message);
 
-  } finally {
-
-    dbPool.close();
-
-  }
+  } 
 };
- 
-
 
 /* ############# INSTITUCIONES EDUCATIVAS ############# */
 exports.getAllInstitucionesRepository = async () => {
-  let dbPool = await getPool();
-
+ 
   try {
+
+    const query = `
+      SELECT
+          *
+      FROM
+          institucion_educativa
+    `;
   
-    const result = await dbPool.request().query(`
-            SELECT
-                *
-            FROM
-                institucion_educativa
-            `);
-    return result.recordset;
+    const result = await pool.query(query);
+
+    return result.rows;
 
   } catch (error) {
 
     console.error("REPOSITORY - Error al obtener instituciones educativas: " + error);
     throw Error(error.message);
 
-  }finally {
-        
-    dbPool.close(); 
-
-  } 
+  }
 };
 
 exports.getInstitucionByEmailRepository = async (institucion) => {
 
-  let dbPool = await getPool();
-
   try {
     
     const query = `
-            SELECT
-                *
-            FROM
-                institucion_educativa
-            WHERE
-                institucion_educativa.email = @email
-            `;
-    const result = await dbPool
-      .request()
-      .input("email", sql.VarChar, institucion.email)
-      .query(query);
+      SELECT
+          *
+      FROM
+          institucion_educativa
+      WHERE
+          email = $1
+    `;
+
+    const values = [institucion.email];
+
+    const result = await pool.query(query, values);
+
     return result.recordset;
+
   } catch (error) {
 
     console.error(
@@ -580,15 +527,10 @@ exports.getInstitucionByEmailRepository = async (institucion) => {
     );
     throw Error(error.message);
 
-  }finally {
-        
-    dbPool.close(); 
-
-  } 
+  }
 };
-
+////aca estoy
 exports.createInstitucionRepository = async (institucion) => {
-  dbPool = await getPool();
 
   try {
     
