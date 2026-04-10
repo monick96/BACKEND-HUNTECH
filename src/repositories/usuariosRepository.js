@@ -527,7 +527,7 @@ exports.getInstitucionByEmailRepository = async (institucion) => {
 
     const result = await pool.query(query, values);
 
-    return result.recordset;
+    return result.rows;
 
   } catch (error) {
 
@@ -583,7 +583,8 @@ exports.deleteInstitucionRepository = async (institucion) => {
 
     const result = await pool.query(query, values);
 
-    return result.values[0].email;
+    //si elimino qu devuelva el email si no null, debo ponerlo en todos los deletes
+    return result.rows.length > 0 ? result.rows[0].email : null;
 
   } catch (error) {
 
