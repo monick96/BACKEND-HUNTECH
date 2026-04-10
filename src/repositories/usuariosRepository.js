@@ -39,17 +39,17 @@ exports.chequearSiExisteUsuarioConEmail = async (usuario) => {
 
 //este devuelve tambien el nombre de la tabla en que encontro el email
 exports.chequearSiExisteUsuarioConEmailRetornarNombreTabla = async (email) => {
-  let dbPool = await getPool();
-
+ 
   try {
 
     // en usamos LIMIT 1 en lugar de TOP 1
     const query = `
-        SELECT 'gerente' AS tabla FROM gerente WHERE email = $1 LIMIT 1
+        SELECT 'gerente' AS tabla FROM gerente WHERE email = $1
         UNION ALL
-        SELECT 'desarrollador' AS tabla FROM desarrollador WHERE email = $1 LIMIT 1
+        SELECT 'desarrollador' AS tabla FROM desarrollador WHERE email = $1
         UNION ALL
-        SELECT 'institucion_educativa' AS tabla FROM institucion_educativa WHERE email = $1 LIMIT 1;
+        SELECT 'institucion_educativa' AS tabla FROM institucion_educativa WHERE email = $1 
+        LIMIT 1;
     `;
 
     const result = await pool.query(query, [email]);
@@ -84,6 +84,15 @@ exports.updateUsuarioByEmailRepository = async (email, usuario) => {
     let setClauses = [];
     let values = [];
     let paramIndex = 1;
+
+    if (!usuario.rol) {
+      throw new Error("El campo 'rol' es obligatorio para saber qué tabla actualizar.");
+    }
+
+    //las tablas se llaman igual que los roles permitidos
+    if (!TABLAS_PERMITIDAS.includes(usuario.rol)) {
+      throw new Error("Rol inválido.");
+    }
 
     // GERENTE
     if (usuario.rol === "gerente") {
@@ -210,6 +219,7 @@ exports.updateUsuarioByEmailRepository = async (email, usuario) => {
     throw Error("Error al actualizar usuario: " + error.message);
 
   }
+
 };
 
 /* ############# GERENTES ############# */
@@ -292,8 +302,8 @@ exports.deleteGerenteRepository = async (gerente) => {
         FROM
             gerente
         WHERE
-            gerente.email = $1
-        RETURNING email_gerente;
+            email = $1
+        RETURNING email;
     `;
 
     const values = [gerente.email];
@@ -371,7 +381,6 @@ exports.getDesarrolladorByEmailRepository = async (desarrollador) => {
   }
 
 };
-
 
 exports.createDesarrolladorRepository = async (desarrollador) => {
 
@@ -529,63 +538,58 @@ exports.getInstitucionByEmailRepository = async (institucion) => {
 
   }
 };
-////aca estoy
+
+
 exports.createInstitucionRepository = async (institucion) => {
 
   try {
     
     const query = `
-            INSERT INTO
-                dbo.institucion_educativa
-                (id, nombre, email)
-            VALUES
-                (@id, @nombre, @email)
-        `;
-    await dbPool
-      .request()
-      .input("id",  sql.VarChar, institucion.id || "")
-      .input("nombre",  sql.VarChar, institucion.nombre || "")
-      .input("email", sql.VarChar, institucion.email || "")
-      .query(query);
+      INSERT INTO
+          institucion_educativa(id, nombre, email)
+      VALUES
+          ($1, $2, $3)
+      RETURNING email
+    `;
 
-    return institucion.email;
+    const values = [institucion.id, institucion.nombre, institucion.email]
+
+
+    const result = await pool.query(query, values);
+
+    return result.rows[0].email;
 
   } catch (error) {
 
     console.error("REPOSITORY - Error al crear institucion educativa: " + error.message);
     throw Error(error.message);
 
-  }finally {
-        
-    dbPool.close(); 
-
-  } 
+  }
 };
 
 exports.deleteInstitucionRepository = async (institucion) => {
 
-  let dbPool = await getPool();
-
   try {
     const query = `
-            DELETE
-            FROM
-                institucion_educativa
-            WHERE
-                institucion_educativa.email = @email
-        `;
-    await dbPool.request().input("email",  sql.VarChar, institucion.email).query(query);
+      DELETE
+      FROM
+          institucion_educativa
+      WHERE
+          email = $1
+      RETURNING email;
+    `;
 
-    return institucion.email;
+    const values = [institucion.email];
+
+    const result = await pool.query(query, values);
+
+    return result.values[0].email;
+
   } catch (error) {
 
     console.error("REPOSITORY - Error al eliminar institucion educativa: " + error.message);
     throw Error(error.message);
 
-  }finally {
-        
-    dbPool.close(); 
-
-  } 
+  }
 
 };
