@@ -92,4 +92,26 @@ tener corriendo el proyecto y probar ruta getcarreras y crear carrera desde post
   - 100 GB de File Storage (para imágenes, PDFs, etc.).
   - 250 GB de transferencia de datos.
   - Backups diarios con retención de 7 días.
+- ---------
+
+- cambie nombre de rutas en router usuario para mayor coherencia 
+ 
+antes:
+  ```
+
+  routerUsuario.get('/user/:email', usuarioController.readUsuarioExistByEmail)
+  ```
+  ``` 
+  routerUsuario.get('/user/:email/:tabla', usuarioController.readUserByEmail)
+  ```
+
+ahora 
+  ```
+  routerUsuario.get('/usuario/:email', usuarioController.readUsuarioExistByEmail)
+  ```
+  ```
+  routerUsuario.get('/usuario/:email/:tabla', usuarioController.readUserByEmail)
+  ```
+
 - 
+

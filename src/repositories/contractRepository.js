@@ -182,8 +182,18 @@ exports.updateContractRepository = async (id, contractUpdated) => {
     IMPORTANTE: ESTE CAMPO TIENE QUE IR ACA ABAJO PARA NO ROMPER TODO POR EL TEMA DE LA COMA QUE METE EN EL MEDIO  */
     if (postulaciones != null) {
       // en postgres, para concatenar strings usamos ||
-      // debe quedar: postulaciones = postulaciones || ',' || $5//habra que probar
-      setClauses.push(`postulaciones = postulaciones || ',' || $${paramIndex}`);
+      // debe quedar: postulaciones = postulaciones || ',' || $5
+      //setClauses.push(`postulaciones = postulaciones || ',' || $${paramIndex}`);
+      // si el email esta en el texto LIKE evita duplicados
+      // si es vacio o nulo, pone solo el email evita la coma inicial
+      // si no, concatena la coma y el nuevo email
+      setClauses.push(`
+        postulaciones = CASE 
+          WHEN postulaciones LIKE '%' || $${paramIndex} || '%' THEN postulaciones 
+          WHEN postulaciones IS NULL OR postulaciones = '' THEN $${paramIndex} 
+          ELSE postulaciones || ',' || $${paramIndex} 
+        END
+      `);
 
       values.push(postulaciones);
 
