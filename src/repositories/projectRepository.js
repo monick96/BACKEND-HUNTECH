@@ -252,7 +252,8 @@ exports.deleteProjectRepository = async (email_gerente) => {
       query, values
     );
 
-    return result.rows[0].email_gerente;
+    return result.rows.length > 0 ? result.rows[0].email_gerente : null;
+
 
   } catch (error) {
 

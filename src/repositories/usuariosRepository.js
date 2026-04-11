@@ -313,7 +313,7 @@ exports.deleteGerenteRepository = async (gerente) => {
       query, values
     );
 
-    return result.rows[0].email_gerente;
+    return result.rows.length > 0 ? result.rows[0].email : null;
 
   } catch (error) {
 
@@ -430,7 +430,7 @@ exports.deleteDesarrolladorRepository = async (desarrollador) => {
 
     const result = await pool.query(query, values);
 
-    return result.rows[0].email;
+    return result.rows.length > 0 ? result.rows[0].email : null;
 
   } catch (error) {
 
