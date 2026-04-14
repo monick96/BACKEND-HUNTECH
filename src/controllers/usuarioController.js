@@ -218,7 +218,7 @@ exports.deleteDesarrollador = async (req, res) => {
 exports.updateDesarrolladorByEmail = async (req, res) => {
     try {
         let { email } = req.params;
-        let { desarrollador } = req.body;
+        let desarrollador = req.body;
 
         let result = await usuariosService.updateDesarrolladorByEmail(email, desarrollador);
 
