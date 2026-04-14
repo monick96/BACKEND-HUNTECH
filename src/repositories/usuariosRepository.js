@@ -158,13 +158,40 @@ exports.updateUsuarioByEmailRepository = async (email, usuario) => {
     // DESARROLLADOR
     else if (usuario.rol === "desarrollador") {
 
-      const { nombre, descripcion, skills } = usuario;
+      const { nombre, apellido, descripcion, skills, perfil_it, fecha_nacimiento} = usuario;
 
       if (nombre != null) { 
 
         setClauses.push(`nombre = $${paramIndex}`); 
 
         values.push(nombre); 
+
+        paramIndex++; 
+      }
+
+      if (apellido != null) { 
+
+        setClauses.push(`apellido = $${paramIndex}`); 
+
+        values.push(apellido); 
+
+        paramIndex++; 
+      }
+
+      if (perfil_it != null) { 
+
+        setClauses.push(`perfil_it = $${paramIndex}`); 
+
+        values.push(perfil_it); 
+
+        paramIndex++; 
+      }
+
+      if (fecha_nacimiento != null) { 
+
+        setClauses.push(`fecha_nacimiento = $${paramIndex}`); 
+
+        values.push(fecha_nacimiento); 
 
         paramIndex++; 
       }
@@ -387,8 +414,8 @@ exports.createDesarrolladorRepository = async (desarrollador) => {
   try {
 
     const query = `
-        INSERT INTO desarrollador (email, id, nombre, apellido, descripcion, fecha_nacimiento)
-        VALUES ($1, $2, $3, $4, $5, $6)
+        INSERT INTO desarrollador (email, id, nombre, apellido, descripcion, fecha_nacimiento, perfil_it, skills)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING email;
     `;
 
@@ -398,7 +425,9 @@ exports.createDesarrolladorRepository = async (desarrollador) => {
       desarrollador.nombre || "",
       desarrollador.apellido || "",
       desarrollador.descripcion || "",
-      desarrollador.fecha_nacimiento || ""
+      desarrollador.fecha_nacimiento || "",
+      desarrollador.perfil_it || "",
+      desarrollador.skills || ""
     ];
 
     await pool.query(query, values);
