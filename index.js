@@ -15,7 +15,10 @@ const cors = require('cors');
 app.use(express.json());
 
 app.use(cors({
-    origin: 'http://localhost:4200' 
+    origin: [
+        'http://localhost:4200', 
+        process.env.FRONTEND_URL
+    ]
 }));
 
 //rutass
