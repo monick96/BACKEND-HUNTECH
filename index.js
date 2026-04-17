@@ -57,7 +57,11 @@ const swaggerSpec = swaggerJsdoc(swaggerOptions);
 //  ruta para visualizar Swagger
 // se usa customCssUrl para que la interfaz gráfica cargue bien en Vercel
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-    customCssUrl: 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css'
+    customCssUrl: 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css',
+    customJs: [
+        "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui-bundle.js",
+        "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui-standalone-preset.js"
+    ]
 }));
 
 //rutass
