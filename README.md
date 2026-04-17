@@ -40,3 +40,5 @@ El backend está construido bajo un modelo de arquitectura en capas para asegura
     ```Bash
         node index.js
     ```
+Proyecto académico para la materia Desarrollo de Sistemas Web (Back End) - 2do año 2do cuatrimestre
+
