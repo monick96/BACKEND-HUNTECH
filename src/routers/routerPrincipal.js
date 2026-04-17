@@ -1,6 +1,5 @@
 const express = require('express');
 const routerPrincipal = express.Router();
-const DOC = require('../utils/doc')
 
 // Ruta que apunta a la raíz del proyecto (/api) y redirige a la documentación
 //ahora en swagger
