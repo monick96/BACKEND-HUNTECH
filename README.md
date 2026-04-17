@@ -19,6 +19,7 @@ El backend está construido bajo un modelo de arquitectura en capas para asegura
 * **Framework:** Express.js
 * **Base de Datos:** PostgreSQL (alojada en Supabase)
 * **Despliegue:** Vercel
+* **Documentación:** Swagger
 
 ## Instalación y Ejecución Local
 
