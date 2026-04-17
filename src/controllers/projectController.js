@@ -101,7 +101,7 @@ exports.deleteProject = async (req, res) => {
   try {
     let { email } = req.params;
     result = await projectService.deleteProject(email)
-    res.status(201);
+    res.status(200);
     res.json({ message: 'proyecto eliminado', email: result });
 
   } catch (error) {

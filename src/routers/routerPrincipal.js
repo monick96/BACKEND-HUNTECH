@@ -1,15 +1,11 @@
 const express = require('express');
 const routerPrincipal = express.Router();
-const DOC = require('../utils/doc')
 
-//ruta que apunta a la ruta raiz del proyecto -retorna la documentacion
-//doc.js
-//como exepcion solo aca voy a hacer req res y responder por el router por que es un archivo local
-
-routerPrincipal.get('/',(req, res)=>{ 
-    res.status(200);
-    res.json(DOC);
-})
-
+// Ruta que apunta a la raíz del proyecto (/api) y redirige a la documentación
+//ahora en swagger
+routerPrincipal.get('/', (req, res) => { 
+    // Redirige al usuario a la interfaz de Swagger
+    res.redirect('/api/docs');
+});
 
 module.exports = routerPrincipal;
