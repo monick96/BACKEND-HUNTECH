@@ -23,6 +23,7 @@ routerUsuario.get('/desarrolladores', usuarioController.readDesarrolladores)
 routerUsuario.get('/desarrolladorbyemail', usuarioController.readDesarrolladorByEmail)
 routerUsuario.post('/desarrollador', usuarioController.createDesarrollador)
 routerUsuario.delete('/desarrollador', usuarioController.deleteDesarrollador)
+//este metodo funciona pero el que deberia usarse es routerUsuario.put('/usuario/:email', usuarioController.updateUsuarioByEmail)
 routerUsuario.put('/desarrollador/:email', usuarioController.updateDesarrolladorByEmail)
 
 
