@@ -24,7 +24,7 @@ El backend está construido bajo un modelo de arquitectura en capas para asegura
 
 1. Clonar el repositorio:
    ```bash
-        git clone [https://github.com/monick96/BACKEND-HUNTECH.git](https://github.com/monick96/BACKEND-HUNTECH.git)
+        git clone https://github.com/monick96/BACKEND-HUNTECH.git
    ```
 2. Instalar las dependencias:
     ```Bash
