@@ -6,7 +6,7 @@ Este proyecto maneja la lógica de negocio, persistencia de datos y provee los e
 
 El backend está construido bajo un modelo de arquitectura en capas para asegurar el desacoplamiento y facilitar el mantenimiento. 
 
-![Diagrama de Arquitectura de Capas]([https://raw.githubusercontent.com/monick96/BACKEND-HUNTECH/refs/heads/documentacion/huntech-2026-04-17.png]) 
+![Diagrama de Arquitectura de Capas]([./huntech-2026-04-17.png]) 
 ### Estructura de Capas
 * **Routes:** Definen los endpoints de la API y delegan la petición.
 * **Controllers:** Reciben la petición HTTP, validan los datos de entrada y manejan las respuestas.
