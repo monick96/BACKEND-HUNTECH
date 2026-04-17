@@ -43,7 +43,7 @@ const swaggerOptions = {
                 description: 'Servidor Local'
             },
             {
-                url: process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '',
+                url: process.env.BACKEND_URL,
                 description: 'Servidor Producción (Vercel)'
             }
         ]
