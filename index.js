@@ -39,13 +39,14 @@ const swaggerOptions = {
         },
         servers: [
             {
-                url: `http://${HOSTNAME}:${PORT}`,
-                description: 'Servidor Local'
+                url: process.env.BACKEND_URL,//servidor vercel por defecto
+                description: 'Servidor Producción (Vercel)'
             },
             {
-                url: process.env.BACKEND_URL,
-                description: 'Servidor Producción (Vercel)'
+                url: `http://${HOSTNAME}:${PORT}`,
+                description: 'Servidor Local'
             }
+            
         ]
     },
     // Le indicamos que busque los comentarios en todos los archivos dentro de routers
