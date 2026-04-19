@@ -18,14 +18,13 @@ const app = express();
 const cors = require('cors');
 app.use(express.json());
 
+// la lista desde la variable de entorno y convertirla en array
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+    ? process.env.ALLOWED_ORIGINS.split(',') 
+    : [];
+
 app.use(cors({
-    origin: [
-        'http://localhost:4200',
-        'http://127.0.0.1:3000',
-        process.env.FRONTEND_URL,
-        process.env.VERCEL_URL,
-        process.env.BACKEND_URL
-    ]
+    origin: allowedOrigins
 }));
 
 // configuración de Swagger
