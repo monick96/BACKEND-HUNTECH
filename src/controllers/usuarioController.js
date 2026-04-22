@@ -206,7 +206,7 @@ exports.deleteDesarrollador = async (req, res) => {
         let desarrollador = req.body;
         result = await usuariosService.deleteDesarrollador(desarrollador)
         res.status(200);
-        res.json({ message: 'desarrollador eliminado', gerente_email: result });
+        res.json({ message: 'desarrollador eliminado', desarrollador_email: result });
 
     } catch (error) {
         console.error('Error al eliminar desarrollador: ' + error);
