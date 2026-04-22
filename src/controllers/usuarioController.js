@@ -239,22 +239,19 @@ exports.readUserByEmail = async (req, res) => {
 
         result = await usuariosService.getUserByEmail(email, tabla);
 
-        res.status(200);
-        if (result.length == 0) {
-
-            res.json({
-                message: 'No hay ningún Usuario en ' + tabla + ' con ese email',
-                count: result.length,
-                data: result
-            });
-
-        } else {
-            res.json({
-                message: 'Usuario obtenido correctamente',
-                count: result.length,
-                data: result
+        if (result.length === 0) {
+            return res.status(404).json({
+                message: 'No hay ningún usuario en ' + tabla + ' con ese email',
+                count: 0,
+                data: []
             });
         }
+
+        return res.status(200).json({
+            message: 'Usuario obtenido correctamente',
+            count: result.length,
+            data: result
+        });
 
     } catch (error) {
         console.error('Error al obtener Usuario: ' + error);
@@ -331,7 +328,7 @@ exports.deleteInstitucion = async(req, res)=>{
     try {
         let institucion = req.body;
         result = await usuariosService.deleteInstitucion(institucion)
-        res.status(201);       
+        res.status(200);       
         res.json({ message: 'institucion educativa eliminada', email_institucion:result });
         
     } catch (error) {
