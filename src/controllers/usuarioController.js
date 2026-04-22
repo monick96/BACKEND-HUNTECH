@@ -77,7 +77,7 @@ exports.readGerenteByEmail = async (req, res) => {
     try {
         let gerente = req.body;
         result = await usuariosService.getGerenteByEmail(gerente)
-        res.status(201);
+        res.status(200);
         if (result.length == 0) {
             res.json({
                 message: 'No hay ningún gerente con ese email',
@@ -124,7 +124,7 @@ exports.deleteGerente = async (req, res) => {
     try {
         let gerente = req.body;
         result = await usuariosService.deleteGerente(gerente)
-        res.status(201);
+        res.status(200);
         res.json({ message: 'gerente eliminado', gerente_email: result });
 
     } catch (error) {
@@ -158,7 +158,7 @@ exports.readDesarrolladorByEmail = async (req, res) => {
     try {
         let desarrollador = req.body;
         result = await usuariosService.getDesarrolladorByEmail(desarrollador)
-        res.status(201);
+        res.status(200);
         if (result.length == 0) {
             res.json({
                 message: 'No hay ningún desarrollador con ese email',
@@ -205,8 +205,8 @@ exports.deleteDesarrollador = async (req, res) => {
     try {
         let desarrollador = req.body;
         result = await usuariosService.deleteDesarrollador(desarrollador)
-        res.status(201);
-        res.json({ message: 'desarrollador eliminado', gerente_email: result });
+        res.status(200);
+        res.json({ message: 'desarrollador eliminado', desarrollador_email: result });
 
     } catch (error) {
         console.error('Error al eliminar desarrollador: ' + error);
