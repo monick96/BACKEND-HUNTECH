@@ -29,8 +29,7 @@ routerContrato.get(
  *   get:
  *     summary: Busca contratos asociados a proyecto asociado a gerente.
  *     tags:
- *       - contratos
- *       - gerentes
+ *       - Contratos
  *     parameters:
  *       - in: path
  *         name: emailgerente
