@@ -214,6 +214,24 @@ exports.updateUsuarioByEmailRepository = async (email, usuario) => {
         paramIndex++; 
       }
 
+      if (esta_validado != null) { 
+
+        setClauses.push(`esta_validado = $${paramIndex}`); 
+
+        values.push(esta_validado);
+
+        paramIndex++; 
+      }
+
+      if (validado_por_usuario_id != null) { 
+
+        setClauses.push(`validado_por_usuario_id = $${paramIndex}`); 
+
+        values.push(validado_por_usuario_id);
+
+        paramIndex++; 
+      }
+
       if (descripcion != null) { 
 
         setClauses.push(`descripcion = $${paramIndex}`); 
