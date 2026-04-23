@@ -176,7 +176,7 @@ exports.updateUsuarioByEmailRepository = async (email, usuario) => {
     // DESARROLLADOR
     else if (usuario.rol === "desarrollador") {
 
-      const { nombre, apellido, descripcion, skills, perfil_it, fecha_nacimiento, esta_validado, validado_por_usuario_id} = usuario;
+      const { nombre, apellido, descripcion, skills, perfil_it, fecha_nacimiento, esta_validado, validado_por_usuario_id, genero} = usuario;
 
       if (nombre != null) { 
 
@@ -248,6 +248,14 @@ exports.updateUsuarioByEmailRepository = async (email, usuario) => {
         setClauses.push(`skills = $${paramIndex}`); 
 
         values.push(skillsStr); 
+
+        paramIndex++; 
+      }
+      if (genero != null) { 
+
+        setClauses.push(`genero = $${paramIndex}`); 
+
+        values.push(genero); 
 
         paramIndex++; 
       }
