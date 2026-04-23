@@ -9,7 +9,7 @@ const contractController = require("../controllers/contractController");
  *   get:
  *     summary: Busca contratos que no hayan sido asignados ya a un desarrollador.
  *     tags:
- *       - contratos
+ *       - Contratos
  *     parameters:
  *     responses:
  *       200:
