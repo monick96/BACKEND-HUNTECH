@@ -92,15 +92,15 @@ exports.createContractRepository = async (contract) => {
     const query = `
         INSERT INTO
           contrato
-            (tipo, titulo, descripcion, tiene_postulaciones, postulaciones, esta_ocupado, pasante_email, proyecto_id, start_date, end_date)
+            (tipo, titulo, descripcion, tiene_postulaciones, postulaciones, esta_ocupado, pasante_email, proyecto_id, start_date, end_date, modalidad, seniority_deseado)
         VALUES
-            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+            ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12::seniority_enum[])
         RETURNING id
     `;
 
     const values = [contract.tipo, contract.titulo, contract.descripcion ||'', contract.tiene_postulaciones,
       contract.postulaciones || '', contract.esta_ocupado,  contract.pasante_email || '',  contract.proyecto_id,
-      contract.start_date || '', contract.end_date || ''
+      contract.start_date || '', contract.end_date || '', contract.modalidad, contract.seniority_deseado
     ];
 
     const result = await pool.query(query, values);
@@ -129,6 +129,8 @@ exports.updateContractRepository = async (id, contractUpdated) => {
     proyecto_id,
     start_date,
     end_date,
+    modalidad,
+    seniority_deseado,
   } = contractUpdated;
 
   try {
@@ -241,6 +243,24 @@ exports.updateContractRepository = async (id, contractUpdated) => {
       setClauses.push(`end_date = $${paramIndex}`);
       
       values.push(end_date);
+
+      paramIndex++;
+    }
+
+    if (modalidad != null) {
+
+      setClauses.push(`modalidad = $${paramIndex}`);
+
+      values.push(modalidad);
+
+      paramIndex++;
+    }
+
+    if (seniority_deseado != null) {
+
+      setClauses.push(`seniority_deseado = $${paramIndex}::seniority_enum[]`);
+
+      values.push(seniority_deseado);
 
       paramIndex++;
     }

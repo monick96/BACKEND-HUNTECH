@@ -46,6 +46,21 @@ exports.createContract = async (contract) => {
         if (typeof contract.esta_ocupado !== 'boolean') {
             throw Error('El campo "esta_ocupado" debe ser booleano');
         }
+        if (!contract.modalidad) {
+            throw Error('Se debe indicar la modalidad del contrato');
+        }
+        const MODALIDADES_VALIDAS = ['remoto', 'presencial', 'hibrido'];
+        if (!MODALIDADES_VALIDAS.includes(contract.modalidad)) {
+            throw Error(`La modalidad debe ser una de: ${MODALIDADES_VALIDAS.join(', ')}`);
+        }
+        if (!contract.seniority_deseado || !Array.isArray(contract.seniority_deseado) || contract.seniority_deseado.length === 0) {
+            throw Error('Se debe indicar al menos un seniority deseado (array)');
+        }
+        const SENIORITIES_VALIDOS = ['Trainee', 'Junior', 'Semisenior', 'Senior', 'Indistinto'];
+        const invalidos = contract.seniority_deseado.filter(s => !SENIORITIES_VALIDOS.includes(s));
+        if (invalidos.length > 0) {
+            throw Error(`Seniority inválido: ${invalidos.join(', ')}. Válidos: ${SENIORITIES_VALIDOS.join(', ')}`);
+        }
 
         return await contractRepository.createContractRepository(contract)
 
