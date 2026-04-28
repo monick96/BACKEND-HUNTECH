@@ -176,7 +176,7 @@ exports.updateUsuarioByEmailRepository = async (email, usuario) => {
     // DESARROLLADOR
     else if (usuario.rol === "desarrollador") {
 
-      const { nombre, apellido, descripcion, skills, perfil_it, fecha_nacimiento, esta_validado, validado_por_usuario_id, genero} = usuario;
+      const { nombre, apellido, descripcion, skills, perfil_it, fecha_nacimiento, esta_validado, validado_por_usuario_id, genero, telefono, puesto_actual, is_disponible, is_deleted, idiomas} = usuario;
 
       if (nombre != null) { 
 
@@ -256,6 +256,51 @@ exports.updateUsuarioByEmailRepository = async (email, usuario) => {
         setClauses.push(`genero = $${paramIndex}`); 
 
         values.push(genero); 
+
+        paramIndex++; 
+      }
+
+      if (telefono != null) { 
+
+        setClauses.push(`telefono = $${paramIndex}`); 
+
+        values.push(telefono); 
+
+        paramIndex++; 
+      }
+
+      if (puesto_actual != null) { 
+
+        setClauses.push(`puesto_actual = $${paramIndex}`); 
+
+        values.push(puesto_actual); 
+
+        paramIndex++; 
+      }
+
+      if (is_disponible != null) { 
+
+        setClauses.push(`is_disponible = $${paramIndex}`); 
+
+        values.push(is_disponible); 
+
+        paramIndex++; 
+      }
+
+      if (is_deleted != null) { 
+
+        setClauses.push(`is_deleted = $${paramIndex}`); 
+
+        values.push(is_deleted); 
+
+        paramIndex++; 
+      }
+
+      if (idiomas != null) { 
+
+        setClauses.push(`idiomas = $${paramIndex}`); 
+
+        values.push(idiomas); 
 
         paramIndex++; 
       }
