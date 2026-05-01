@@ -2,6 +2,11 @@ const express = require("express");
 const routerContrato = express.Router();
 const contractController = require("../controllers/contractController");
 
+routerContrato.use((req, res, next) => {
+  console.log(`[CONTRATOS] ${req.method} ${req.originalUrl}`);
+  next();
+});
+
 /* ## Todos los contratos libres ## */
 /**
  * @swagger

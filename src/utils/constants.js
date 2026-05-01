@@ -3,7 +3,8 @@ const CONSTANTES = {
     PORT: 3000,
     //CONTENT_TYPE: 'Content-Type',
     //TYPE_JSON: 'application/json',
-    TABLAS_PERMITIDAS : ['desarrollador', 'gerente', 'institucion_educativa']
+    TABLAS_PERMITIDAS : ['desarrollador', 'gerente', 'institucion_educativa'],
+    TIPOS_USUARIO_PERMITIDOS : ['desarrollador', 'gerente', 'institucion_educativa']
 }
 
 module.exports = CONSTANTES;
