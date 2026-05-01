@@ -9,7 +9,12 @@ const routerCareerDev = require('./src/routers/routerCarrerDev');
 const routerProyecto = require('./src/routers/routerProyecto');
 const routerUsuario = require('./src/routers/routerUsuario');
 const routerContrato = require('./src/routers/routerContrato');
-const routerWhitelistEmail = require('./src/routers/routerWhitelistEmail');
+let routerWhitelistEmail;
+try {
+    routerWhitelistEmail = require('./src/routers/routerWhitelistEmail');
+} catch (e) {
+    console.error('[STARTUP ERROR] No se pudo cargar routerWhitelistEmail:', e.message);
+}
 
 //librerías de Swagger
 const swaggerUi = require('swagger-ui-express');
@@ -85,7 +90,11 @@ app.use('/api', routerContrato);
 app.use('/api', routerUsuario)
 
 //whitelist de emails autorizados a registrarse
-app.use('/api', routerWhitelistEmail)
+if (routerWhitelistEmail) {
+    app.use('/api', routerWhitelistEmail);
+} else {
+    console.error('[STARTUP] routerWhitelistEmail no disponible, endpoints de whitelist deshabilitados');
+}
 
 //inicia server y escucha solicitudes
 //3 parametros=> puerto, hostname, callback
