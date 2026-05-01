@@ -4,6 +4,8 @@
   "description": "Proyecto académico para la materia Desarrollo de Sistemas Web (Back End) - 2do año 2do cuatrimestre",
   "main": "index.js",
   "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -19,13 +21,16 @@
   "homepage": "https://github.com/monick96/BACKEND-HUNTECH#readme",
   "dependencies": {
     "cors": "^2.8.5",
+    "csv-parse": "^6.2.1",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
+    "multer": "^2.1.1",
     "pg": "^8.20.0",
     "serverless-http": "^4.0.0",
     "sql-cli": "^0.6.2",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
