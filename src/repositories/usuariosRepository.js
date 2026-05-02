@@ -97,13 +97,31 @@ exports.updateUsuarioByEmailRepository = async (email, usuario) => {
     // GERENTE
     if (usuario.rol === "gerente") {
 
-      const { id_gerente, id_proyecto, nombre, descripcion, esta_validado, validado_por_usuario_id} = usuario;
+      const { id_gerente, id_proyecto, nombre, apellido, telefono, descripcion, esta_validado, validado_por_usuario_id } = usuario;
 
       if (nombre != null) { 
 
         setClauses.push(`nombre = $${paramIndex}`); 
 
         values.push(nombre); 
+
+        paramIndex++; 
+      }
+
+      if (apellido != null) { 
+
+        setClauses.push(`apellido = $${paramIndex}`); 
+
+        values.push(apellido); 
+
+        paramIndex++; 
+      }
+
+      if (telefono != null) { 
+
+        setClauses.push(`telefono = $${paramIndex}`); 
+
+        values.push(telefono); 
 
         paramIndex++; 
       }
