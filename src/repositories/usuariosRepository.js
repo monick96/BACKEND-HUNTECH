@@ -176,7 +176,7 @@ exports.updateUsuarioByEmailRepository = async (email, usuario) => {
     // DESARROLLADOR
     else if (usuario.rol === "desarrollador") {
 
-      const { nombre, apellido, descripcion, skills, perfil_it, fecha_nacimiento, esta_validado, validado_por_usuario_id, genero} = usuario;
+      /*const { nombre, apellido, descripcion, skills, perfil_it, fecha_nacimiento, esta_validado, validado_por_usuario_id, genero} = usuario;
 
       if (nombre != null) { 
 
@@ -276,7 +276,9 @@ exports.updateUsuarioByEmailRepository = async (email, usuario) => {
       
       const result = await pool.query(query, values);
 
-      return result.rows[0];
+      return result.rows[0];*/
+
+      return await updateDesarrolladorTransaccional(email, usuario);
     } 
     
     // INSTITUCION
@@ -291,6 +293,230 @@ exports.updateUsuarioByEmailRepository = async (email, usuario) => {
 
   }
 
+};
+
+////metodo transaccional(si algo falla que falle todo y no cambie nada) para update dev por las tablas nuevas idioma y habilidades
+//solo se utiliza en el repositorio asi que no uso exports
+const updateDesarrolladorTransaccional = async (email, usuario) => {
+  const client = await pool.connect();//este pool se encarga de principio a fin de esta operacion update
+
+  try {
+    await client.query('BEGIN');
+
+    // variables solo para el dev
+    let setClauses = [];
+    let values = [];
+    let paramIndex = 1;
+    const { nombre, apellido, descripcion, skills, perfil_it, fecha_nacimiento, esta_validado, validado_por_usuario_id, genero, esta_disponible} = usuario;
+    //evaluamos los campos con datos simples para update en dev
+    if (nombre != null) { 
+
+      setClauses.push(`nombre = $${paramIndex}`); 
+
+      values.push(nombre); 
+
+      paramIndex++; 
+    }
+
+    if (apellido != null) { 
+
+      setClauses.push(`apellido = $${paramIndex}`); 
+
+      values.push(apellido); 
+
+      paramIndex++; 
+    }
+
+    if (perfil_it != null) { 
+
+      setClauses.push(`perfil_it = $${paramIndex}`); 
+
+      values.push(perfil_it); 
+
+      paramIndex++; 
+    }
+
+    if (fecha_nacimiento != null) { 
+
+      setClauses.push(`fecha_nacimiento = $${paramIndex}`); 
+
+      values.push(fecha_nacimiento); 
+
+      paramIndex++; 
+    }
+
+    if (esta_validado != null) { 
+
+      setClauses.push(`esta_validado = $${paramIndex}`); 
+
+      values.push(esta_validado);
+
+      paramIndex++; 
+    }
+
+    if (validado_por_usuario_id != null) { 
+
+      setClauses.push(`validado_por_usuario_id = $${paramIndex}`); 
+
+      values.push(validado_por_usuario_id);
+
+      paramIndex++; 
+    }
+
+    if (descripcion != null) { 
+
+      setClauses.push(`descripcion = $${paramIndex}`); 
+
+      values.push(descripcion); 
+
+      paramIndex++; 
+    }
+    
+    if (skills != null) { 
+
+      const skillsStr = Array.isArray(skills) ? skills.join(',') : skills;
+
+      setClauses.push(`skills = $${paramIndex}`); 
+
+      values.push(skillsStr); 
+
+      paramIndex++; 
+    }
+
+    if (genero != null) { 
+
+      setClauses.push(`genero = $${paramIndex}`); 
+
+      values.push(genero); 
+
+      paramIndex++; 
+    }
+
+    if (esta_disponible != null) { 
+
+      setClauses.push(`esta_disponible = $${paramIndex}`); 
+
+      values.push(esta_disponible);
+
+      paramIndex++; 
+    }
+
+    if (setClauses.length > 0) {
+      //hacemos update de los campos simples si es que vinieron en el body
+      values.push(email);
+      const query = `UPDATE desarrollador SET ${setClauses.join(', ')} WHERE email = $${paramIndex} RETURNING *;`;
+      // usamos client.query en lugar de pool.query, el mismo pool
+      await client.query(query, values); 
+    }
+
+    // metodos para verificar y hacer update, insert o delete en idiomas y habilidades
+    if (usuario.idiomas) {
+      await sincronizarIdiomas(client, email, usuario.idiomas);
+    }
+
+    if (usuario.habilidades) {
+      await sincronizarHabilidades(client, email, usuario.habilidades);
+    }
+
+    await client.query('COMMIT');
+    
+    // voy a re utilizar el getUserByEmailRepository para retornar el usuario actualizado
+    return await this.getUserByEmailRepository(email, 'desarrollador'); 
+
+  } catch (error) {
+    await client.query('ROLLBACK');
+
+    console.error("Transacción fallida en desarrollador, usuarios repository:", error.message);
+    throw error;
+
+  } finally {
+
+    client.release();//libera este pool
+
+  }
+};
+
+const sincronizarHabilidades = async (client, email, habilidadesFrontend) => {
+  // obtenemos el estado actual de habilidades en la base de datos de ese email
+  const resDB = await client.query(
+    "SELECT nombre_habilidad, nivel_habilidad FROM habilidad_x_desarrollador WHERE email_desarrollador = $1",
+    [email]
+  );
+
+  const habilidadesDB = resDB.rows;
+
+  // nos quedamos solo los nombres para simplificar la comparación
+  const nombresFrontend = habilidadesFrontend.map(h => h.nombre_habilidad);
+  const nombresDB = habilidadesDB.map(h => h.nombre_habilidad);
+
+  // verificamos cuáles existen en DB pero ya no vienen del Frontend
+  const aBorrar = nombresDB.filter(nombre => !nombresFrontend.includes(nombre));
+
+  if (aBorrar.length > 0) {
+    await client.query(
+      "DELETE FROM habilidad_x_desarrollador WHERE email_desarrollador = $1 AND nombre_habilidad = ANY($2)",
+      [email, aBorrar]
+    );
+  }
+
+  // Iteramos sobre lo que envió el frontend para actualizar o insertar
+  for (const habFront of habilidadesFrontend) {
+    if (nombresDB.includes(habFront.nombre_habilidad)) {
+      // Ya existía en DB -> UPDATE (por si cambió el nivel)
+      await client.query(
+        "UPDATE habilidad_x_desarrollador SET nivel_habilidad = $1 WHERE email_desarrollador = $2 AND nombre_habilidad = $3",
+        [habFront.nivel_habilidad, email, habFront.nombre_habilidad]
+      );
+    } else {
+      // si no existe, INSERT
+      await client.query(
+        "INSERT INTO habilidad_x_desarrollador (email_desarrollador, nombre_habilidad, nivel_habilidad) VALUES ($1, $2, $3)",
+        [email, habFront.nombre_habilidad, habFront.nivel_habilidad]
+      );
+    }
+  }
+};
+
+// update los idiomas de un desarrollador
+const sincronizarIdiomas = async (client, email, idiomasFrontend) => {
+  // idiomas del dev en db
+  const resDB = await client.query(
+    "SELECT nombre_idioma, nivel_idioma FROM idioma_x_desarrollador WHERE email_desarrollador = $1", 
+    [email]
+  );
+  const idiomasDB = resDB.rows; // [{nombre_idioma: 'Inglés', nivel: 'Básico'}]
+
+  // nos quedamos con los nombres
+  const nombresFrontend = idiomasFrontend.map(i => i.nombre_idioma);
+  const nombresDB = idiomasDB.map(i => i.nombre_idioma);
+
+  // cualesestan en la DB pero NO en el front
+  const aBorrar = nombresDB.filter(nombre => !nombresFrontend.includes(nombre));
+  
+  if (aBorrar.length > 0) {
+    // Usamos el operador ANY para borrar varios en una sola consulta
+    await client.query(
+      "DELETE FROM idioma_x_desarrollador WHERE email_desarrollador = $1 AND nombre_idioma = ANY($2)",
+      [email, aBorrar] 
+    );
+  }
+
+  // hay que AGREGAR y/o ACTUALIZAR?
+  for (const idiomaFront of idiomasFrontend) {
+    if (nombresDB.includes(idiomaFront.nombre_idioma)) {
+      // Ya existía en DB -> UPDATE (por si cambió el nivel)
+      await client.query(
+        "UPDATE idioma_x_desarrollador SET nivel_idioma = $1 WHERE email_desarrollador = $2 AND nombre_idioma = $3",
+        [idiomaFront.nivel_idioma, email, idiomaFront.nombre_idioma]
+      );
+    } else {
+      // No existía en DB -> INSERT
+      await client.query(
+        "INSERT INTO idioma_x_desarrollador (email_desarrollador, nombre_idioma, nivel_idioma) VALUES ($1, $2, $3)",
+        [email, idiomaFront.nombre_idioma, idiomaFront.nivel_idioma]
+      );
+    }
+  }
 };
 
 /* ############# GERENTES ############# */
