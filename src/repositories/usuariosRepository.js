@@ -540,13 +540,30 @@ exports.getUserByEmailRepository = async (email, tabla) => {
       throw Error('Tabla no permitida');
     }
 
-    const query = `SELECT * FROM ${tabla} WHERE email = $1`;
+    // obbtenemos los datos para gerentes, devs e instituciones
+    const queryPrincipal = `SELECT * FROM ${tabla} WHERE email = $1`;
+    const resultPrincipal = await pool.query(queryPrincipal, [email]);
+    let usuarioBase = resultPrincipal.rows[0];
 
-    const values = [email];
+    // si usuario no existe en la DB o si no es desarrollador, 
+    // cortamos la ejecución y devolvemos 
+    if (!usuarioBase || tabla !== 'desarrollador') {
+      return usuarioBase;
+    }
 
-    const result = await pool.query(query, values);
+    //voy a usar lo aprendido en concurrencia 
+    // y voy a lanzar dos consultas en paralelo para que no sea tan lento
+    //si el user es desarrollador
+    const [resultadosIdiomas, resultadosHabilidades] = await Promise.all([
+      pool.query("SELECT nombre_idioma, nivel_idioma FROM idioma_x_desarrollador WHERE email_desarrollador = $1", [email]),
+      pool.query("SELECT nombre_habilidad, nivel_habilidad FROM habilidad_x_desarrollador WHERE email_desarrollador = $1", [email])
+    ]);
 
-    return result.rows[0];;
+    // asocio al usuario los resultados , para que lo maneje el front
+    usuarioBase.idiomas = resultadosIdiomas.rows;
+    usuarioBase.habilidades = resultadosHabilidades.rows;
+
+    return usuarioBase;
 
   } catch (error) {
 
