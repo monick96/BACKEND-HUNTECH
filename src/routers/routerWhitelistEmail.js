@@ -3,18 +3,6 @@ const multer  = require('multer');
 const routerWhitelistEmail = express.Router();
 const whitelistEmailController = require('../controllers/whitelistEmailController');
 
-// Endpoint de diagnóstico — no requiere DB ni auth
-routerWhitelistEmail.get('/whitelist-email/health', (req, res) => {
-    const pkg = require('../../package.json');
-    res.status(200).json({
-        status: 'ok',
-        node: process.version,
-        env: process.env.NODE_ENV || 'no seteado',
-        multerVersion: pkg.dependencies['multer'],
-        csvParseVersion: pkg.dependencies['csv-parse'],
-    });
-});
-
 // TODO [AUTH]: agregar middleware requireAdmin cuando esté disponible el sistema
 // de autenticación. Ej:
 //   const requireAdmin = require('../middlewares/requireAdmin');
