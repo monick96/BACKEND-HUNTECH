@@ -307,7 +307,7 @@ const updateDesarrolladorTransaccional = async (email, usuario) => {
     let setClauses = [];
     let values = [];
     let paramIndex = 1;
-    const { nombre, apellido, descripcion, skills, perfil_it, fecha_nacimiento, esta_validado, validado_por_usuario_id, genero, esta_disponible} = usuario;
+    const { nombre, apellido, descripcion, skills, perfil_it, fecha_nacimiento, esta_validado, validado_por_usuario_id, genero, is_disponible} = usuario;
     //evaluamos los campos con datos simples para update en dev
     if (nombre != null) { 
 
@@ -392,11 +392,11 @@ const updateDesarrolladorTransaccional = async (email, usuario) => {
       paramIndex++; 
     }
 
-    if (esta_disponible != null) { 
+    if (is_disponible != null) { 
 
-      setClauses.push(`esta_disponible = $${paramIndex}`); 
+      setClauses.push(`is_disponible = $${paramIndex}`); 
 
-      values.push(esta_disponible);
+      values.push(is_disponible);
 
       paramIndex++; 
     }
