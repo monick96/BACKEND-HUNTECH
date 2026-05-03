@@ -9,7 +9,14 @@ const routerCareerDev = require('./src/routers/routerCarrerDev');
 const routerProyecto = require('./src/routers/routerProyecto');
 const routerUsuario = require('./src/routers/routerUsuario');
 const routerContrato = require('./src/routers/routerContrato');
-const routerWhitelistEmail = require('./src/routers/routerWhitelistEmail');
+let routerWhitelistEmail;
+try {
+    routerWhitelistEmail = require('./src/routers/routerWhitelistEmail');
+    console.log('[STARTUP] routerWhitelistEmail cargado correctamente');
+} catch (e) {
+    console.error('[STARTUP ERROR] No se pudo cargar routerWhitelistEmail:', e.message);
+    console.error('[STARTUP ERROR] Stack:', e.stack);
+}
 
 //librerías de Swagger
 const swaggerUi = require('swagger-ui-express');
@@ -37,17 +44,27 @@ const swaggerOptions = {
             version: '1.0.1',
             description: 'Documentación de la API del backend de HunTech, una plataforma de conexión entre desarrolladores y proyectos tecnológicos. Esta API permite gestionar usuarios, proyectos, carreras y contratos, facilitando la interacción entre gerentes y desarrolladores junior y no tanto.',
         },
-        servers: [
-            {
-                url: process.env.BACKEND_URL,//servidor vercel por defecto
-                description: 'Servidor Producción (Vercel)'
-            },
-            {
-                url: `http://${HOSTNAME}:${PORT}`,
-                description: 'Servidor Local'
-            }
-            
-        ]
+        servers: process.env.NODE_ENV !== 'development'
+            ? [
+                {
+                    url: process.env.BACKEND_URL,
+                    description: 'Servidor Producción (Vercel)'
+                },
+                {
+                    url: `http://${HOSTNAME}:${PORT}`,
+                    description: 'Servidor Local'
+                }
+            ]
+            : [
+                {
+                    url: `http://${HOSTNAME}:${PORT}`,
+                    description: 'Servidor Local'
+                },
+                {
+                    url: process.env.BACKEND_URL,
+                    description: 'Servidor Producción (Vercel)'
+                }
+            ]
     },
     // Le indicamos que busque los comentarios en todos los archivos dentro de routers
     apis: ['./src/routers/*.js'], 
@@ -85,7 +102,11 @@ app.use('/api', routerContrato);
 app.use('/api', routerUsuario)
 
 //whitelist de emails autorizados a registrarse
-app.use('/api', routerWhitelistEmail)
+if (routerWhitelistEmail) {
+    app.use('/api', routerWhitelistEmail);
+} else {
+    console.error('[STARTUP] routerWhitelistEmail no disponible, endpoints de whitelist deshabilitados');
+}
 
 //inicia server y escucha solicitudes
 //3 parametros=> puerto, hostname, callback
