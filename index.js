@@ -12,8 +12,10 @@ const routerContrato = require('./src/routers/routerContrato');
 let routerWhitelistEmail;
 try {
     routerWhitelistEmail = require('./src/routers/routerWhitelistEmail');
+    console.log('[STARTUP] routerWhitelistEmail cargado correctamente');
 } catch (e) {
     console.error('[STARTUP ERROR] No se pudo cargar routerWhitelistEmail:', e.message);
+    console.error('[STARTUP ERROR] Stack:', e.stack);
 }
 
 //librerías de Swagger
@@ -42,17 +44,27 @@ const swaggerOptions = {
             version: '1.0.1',
             description: 'Documentación de la API del backend de HunTech, una plataforma de conexión entre desarrolladores y proyectos tecnológicos. Esta API permite gestionar usuarios, proyectos, carreras y contratos, facilitando la interacción entre gerentes y desarrolladores junior y no tanto.',
         },
-        servers: [
-            {
-                url: process.env.BACKEND_URL,//servidor vercel por defecto
-                description: 'Servidor Producción (Vercel)'
-            },
-            {
-                url: `http://${HOSTNAME}:${PORT}`,
-                description: 'Servidor Local'
-            }
-            
-        ]
+        servers: process.env.NODE_ENV !== 'development'
+            ? [
+                {
+                    url: process.env.BACKEND_URL,
+                    description: 'Servidor Producción (Vercel)'
+                },
+                {
+                    url: `http://${HOSTNAME}:${PORT}`,
+                    description: 'Servidor Local'
+                }
+            ]
+            : [
+                {
+                    url: `http://${HOSTNAME}:${PORT}`,
+                    description: 'Servidor Local'
+                },
+                {
+                    url: process.env.BACKEND_URL,
+                    description: 'Servidor Producción (Vercel)'
+                }
+            ]
     },
     // Le indicamos que busque los comentarios en todos los archivos dentro de routers
     apis: ['./src/routers/*.js'], 
