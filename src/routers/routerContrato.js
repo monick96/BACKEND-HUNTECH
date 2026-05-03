@@ -1,7 +1,8 @@
 const express = require("express");
 const routerContrato = express.Router();
 const contractController = require("../controllers/contractController");
-
+///uno pensaria qque solo logea si apuntamos a 
+// /api/contratos pero logea cualquier peticion de cualquier router
 routerContrato.use((req, res, next) => {
   console.log(`[CONTRATOS] ${req.method} ${req.originalUrl}`);
   next();
