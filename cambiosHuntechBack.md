@@ -67,6 +67,18 @@ create table public.contrato (
   end_date varchar(100)
 );
 
+CREATE TABLE public.idioma_x_desarrollador (
+  email_desarrollador VARCHAR(100),
+  nombre_idioma VARCHAR(30),
+  nivel_idioma VARCHAR(30)
+);
+
+CREATE TABLE public.habilidad_x_desarrollador (
+  email_desarrollador VARCHAR(100),
+  nombre_habilidad VARCHAR(30),
+  nivel_habilidad VARCHAR(30)
+);
+
 VARCHAR(MAX) -> TEXT
 BIT -> BOOLEAN
 INT IDENTITY(1,1) -> SERIAL PRIMARY KEY
