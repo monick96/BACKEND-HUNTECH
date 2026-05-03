@@ -5,12 +5,13 @@ const whitelistEmailController = require('../controllers/whitelistEmailControlle
 
 // Endpoint de diagnóstico — no requiere DB ni auth
 routerWhitelistEmail.get('/whitelist-email/health', (req, res) => {
+    const pkg = require('../../package.json');
     res.status(200).json({
         status: 'ok',
         node: process.version,
         env: process.env.NODE_ENV || 'no seteado',
-        multerVersion: require('multer/package.json').version,
-        csvParseVersion: require('csv-parse/package.json').version,
+        multerVersion: pkg.dependencies['multer'],
+        csvParseVersion: pkg.dependencies['csv-parse'],
     });
 });
 
