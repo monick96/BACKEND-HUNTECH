@@ -10,10 +10,12 @@ const routerProyecto = require('./src/routers/routerProyecto');
 const routerUsuario = require('./src/routers/routerUsuario');
 const routerContrato = require('./src/routers/routerContrato');
 let routerWhitelistEmail;
+let whitelistEmailError = null;
 try {
     routerWhitelistEmail = require('./src/routers/routerWhitelistEmail');
     console.log('[STARTUP] routerWhitelistEmail cargado correctamente');
 } catch (e) {
+    whitelistEmailError = { message: e.message, stack: e.stack };
     console.error('[STARTUP ERROR] No se pudo cargar routerWhitelistEmail:', e.message);
     console.error('[STARTUP ERROR] Stack:', e.stack);
 }
@@ -85,6 +87,16 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 //rutass
 //raiz
 app.use('/api', routerPrincipal);
+
+// diagnóstico — siempre disponible independientemente de los routers
+app.get('/api/debug', (req, res) => {
+    res.status(200).json({
+        node: process.version,
+        env: process.env.NODE_ENV || 'no seteado',
+        whitelistRouterLoaded: routerWhitelistEmail != null,
+        whitelistRouterError: whitelistEmailError,
+    });
+});
 
 //carreras
 app.use('/api', routerCarrera);
