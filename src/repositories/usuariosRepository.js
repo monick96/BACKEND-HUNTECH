@@ -621,7 +621,7 @@ exports.getDesarrolladorByEmailRepository = async (desarrollador) => {
 
 };
 
-exports.getDesarrolladorLanguages = async (desarrollador) => {
+exports.getDesarrolladorLanguages = async (email_desarrollador) => {
 
     try {
 
@@ -634,7 +634,7 @@ exports.getDesarrolladorLanguages = async (desarrollador) => {
           idx.email_desarrollador = $1
     `; 
 
-    const values = [desarrollador.email];
+    const values = [email_desarrollador];
 
     const result = await pool.query(
       query, values

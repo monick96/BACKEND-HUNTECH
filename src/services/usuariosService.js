@@ -149,14 +149,14 @@ exports.updateDesarrolladorByEmail = async (email, desarrollador) => {
   }
 };
 
-exports.getDesarrolladorLanguages = async (email) => {
+exports.getDesarrolladorLanguages = async (email_desarrollador) => {
   try {
 
-    if (!email) {
+    if (!email_desarrollador) {
       throw Error("No se ingresó email del desarrollador");
     }
 
-    return await usuariosRepository.getDesarrolladorLanguages(email);
+    return await usuariosRepository.getDesarrolladorLanguages(email_desarrollador);
 
   } catch (error) {
 
