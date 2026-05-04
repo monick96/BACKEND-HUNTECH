@@ -1,4 +1,5 @@
 const usuariosRepository = require("../repositories/usuariosRepository");
+const projectService = require('./projectService');
 
 /*
 ################################## ########## ##################################
@@ -88,7 +89,18 @@ exports.createGerente = async (gerente) => {
     if (!gerente.email) {
       throw Error("Se debe indicar el email del gerente");
     }
-    return await usuariosRepository.createGerenteRepository(gerente);
+    const gerenteCreado = await usuariosRepository.createGerenteRepository(gerente);
+
+    //le creamos un proyecto vacio
+    await projectService.createProject({
+      nombre:`Proyecto de ${gerente.email}`,
+      description: 'Proyecto creado automáticamente',
+      email_gerente: gerente.email,
+      buscando_devs: true
+    });
+
+    return gerenteCreado;
+    
   } catch (error) {
     console.error("SERVICE - Error al crear gerente: " + error);
     throw Error("Error al crear gerente: " + error.message);
