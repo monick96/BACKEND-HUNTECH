@@ -181,9 +181,9 @@ exports.readDesarrolladorByEmail = async (req, res) => {
 
 exports.readDesarrolladorLanguages = async (req, res) => {
     try {
-        let { email_desarrollador } = req.params;
+        let { email } = req.params;
 
-        result = await usuariosService.getDesarrolladorLanguages(email_desarrollador);
+        result = await usuariosService.getDesarrolladorLanguages(email);
 
         if (result.length === 0) {
             return res.status(404).json({
