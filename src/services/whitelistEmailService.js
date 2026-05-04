@@ -156,3 +156,30 @@ exports.listarEmailsService = async ({ estado, tipo_usuario, q, lote_id, page = 
         data: rows,
     };
 };
+
+/**
+ * Verifica si un email está habilitado para registrarse (estado = 'activo').
+ * Devuelve { permitido: boolean, tipo_usuario: string|null }.
+ * No lanza excepción si el email no está: devuelve { permitido: false }.
+ */
+exports.verificarEmailParaRegistroService = async (email) => {
+    const emailNorm = normalizarEmail(email);
+    if (!emailNorm || !EMAIL_REGEX.test(emailNorm)) {
+        throw new Error('Email inválido');
+    }
+
+    const entrada = await whitelistEmailRepository.buscarEmailActivoRepository(emailNorm);
+    if (!entrada) {
+        return { permitido: false, tipo_usuario: null };
+    }
+    return { permitido: true, tipo_usuario: entrada.tipo_usuario };
+};
+
+/**
+ * Marca el email como 'usado' tras completar el registro en la plataforma.
+ * Operación idempotente: si ya estaba 'usado' simplemente retorna null.
+ */
+exports.marcarEmailComoUsadoService = async (email) => {
+    const emailNorm = normalizarEmail(email);
+    return await whitelistEmailRepository.marcarEmailComoUsadoRepository(emailNorm);
+};

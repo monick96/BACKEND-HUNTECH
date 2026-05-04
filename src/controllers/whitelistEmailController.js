@@ -91,6 +91,36 @@ exports.uploadCsv = async (req, res) => {
 };
 
 /**
+ * GET /api/whitelist-email/verificar/:email
+ * Consulta pública usada por el frontend (Angular) ANTES de llamar a
+ * supabase.auth.signUp(). Indica si el email está habilitado y qué rol tiene.
+ * Si no está en whitelist devuelve 403 con mensaje para contactar a admin.
+ */
+exports.verificarEmailParaRegistro = async (req, res) => {
+    try {
+        const { email } = req.params;
+        const resultado = await whitelistEmailService.verificarEmailParaRegistroService(email);
+
+        if (!resultado.permitido) {
+            return res.status(403).json({
+                permitido: false,
+                tipo_usuario: null,
+                message: `Tu email no está autorizado para registrarse en HunTech. Si considerás que deberías poder acceder, comunicate con el equipo de administración: ${process.env.ADMIN_EMAIL || 'admin@huntech.com'}`,
+            });
+        }
+
+        return res.status(200).json({
+            permitido: true,
+            tipo_usuario: resultado.tipo_usuario,
+            message: 'Email autorizado para registrarse',
+        });
+    } catch (error) {
+        console.error('Error al verificar email para registro: ' + error);
+        res.status(400).json({ error: error.message });
+    }
+};
+
+/**
  * GET /api/whitelist-email
  * Listado paginado con filtros: estado, tipo_usuario, q (búsqueda parcial por email),
  * lote_id, page, page_size.

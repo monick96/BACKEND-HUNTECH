@@ -1,4 +1,5 @@
-const usuariosService = require('../services/usuariosService')
+const usuariosService = require('../services/usuariosService');
+const whitelistEmailService = require('../services/whitelistEmailService');
 
 /*
 ################################## ########## ##################################
@@ -115,13 +116,26 @@ exports.createGerente = async (req, res) => {
     try {
         let gerente = req.body;
 
+        const whitelist = await whitelistEmailService.verificarEmailParaRegistroService(gerente.email);
+        if (!whitelist.permitido) {
+            return res.status(403).json({
+                message: `Tu email no está autorizado para registrarse en HunTech. Si considerás que deberías poder acceder, comunicate con el equipo de administración: ${process.env.ADMIN_EMAIL || 'admin@huntech.com'}`,
+            });
+        }
+        if (whitelist.tipo_usuario !== 'gerente') {
+            return res.status(403).json({
+                message: `Tu email está autorizado como ${whitelist.tipo_usuario}, no como gerente. Usá el formulario de registro correspondiente a tu rol.`,
+            });
+        }
+
         const elEmailYaEstaEnUso = await usuariosService.chequearSiExisteUsuarioConEmail(gerente);
 
         if (elEmailYaEstaEnUso == 1) {
             return res.status(400).json({ message: 'Ya existe un usuario con ese email' });
         }
 
-        result = await usuariosService.createGerente(gerente)
+        result = await usuariosService.createGerente(gerente);
+        await whitelistEmailService.marcarEmailComoUsadoService(gerente.email);
         res.status(201);
         res.json({ message: 'gerente creado', email_gerente: result });
 
@@ -175,13 +189,26 @@ exports.createDesarrollador = async (req, res) => {
     try {
         let desarrollador = req.body;
 
+        const whitelist = await whitelistEmailService.verificarEmailParaRegistroService(desarrollador.email);
+        if (!whitelist.permitido) {
+            return res.status(403).json({
+                message: `Tu email no está autorizado para registrarse en HunTech. Si considerás que deberías poder acceder, comunicate con el equipo de administración: ${process.env.ADMIN_EMAIL || 'admin@huntech.com'}`,
+            });
+        }
+        if (whitelist.tipo_usuario !== 'desarrollador') {
+            return res.status(403).json({
+                message: `Tu email está autorizado como ${whitelist.tipo_usuario}, no como desarrollador. Usá el formulario de registro correspondiente a tu rol.`,
+            });
+        }
+
         const elEmailYaEstaEnUso = await usuariosService.chequearSiExisteUsuarioConEmail(desarrollador);
 
         if (elEmailYaEstaEnUso == 1) {
             return res.status(400).json({ message: 'Ya existe un usuario con ese email' });
         }
 
-        result = await usuariosService.createDesarrollador(desarrollador)
+        result = await usuariosService.createDesarrollador(desarrollador);
+        await whitelistEmailService.marcarEmailComoUsadoService(desarrollador.email);
         res.status(201);
         res.json({ message: 'desarrollador creado', email: result });
 
@@ -234,17 +261,30 @@ exports.createInstitucion = async(req, res)=>{
     try {
         let institucion = req.body;
 
+        const whitelist = await whitelistEmailService.verificarEmailParaRegistroService(institucion.email);
+        if (!whitelist.permitido) {
+            return res.status(403).json({
+                message: `Tu email no está autorizado para registrarse en HunTech. Si considerás que deberías poder acceder, comunicate con el equipo de administración: ${process.env.ADMIN_EMAIL || 'admin@huntech.com'}`,
+            });
+        }
+        if (whitelist.tipo_usuario !== 'institucion_educativa') {
+            return res.status(403).json({
+                message: `Tu email está autorizado como ${whitelist.tipo_usuario}, no como institución educativa. Usá el formulario de registro correspondiente a tu rol.`,
+            });
+        }
+
         const elEmailYaEstaEnUso = await usuariosService.chequearSiExisteUsuarioConEmail(institucion);
 
         if (elEmailYaEstaEnUso == 1) {
             return res.status(400).json({ message: 'Ya existe una institucion educativa con ese email' });
         }
 
-        result = await usuariosService.createInstitucion(institucion)
-        res.status(201);       
-        res.json({ message: 'institucion educativa creada', email_institucion:result });   
-    
-    }  
+        result = await usuariosService.createInstitucion(institucion);
+        await whitelistEmailService.marcarEmailComoUsadoService(institucion.email);
+        res.status(201);
+        res.json({ message: 'institucion educativa creada', email_institucion: result });
+
+    }
     catch (error) {
         console.error('Error al crear institucion educativa: ' + error);
         res.status(500)

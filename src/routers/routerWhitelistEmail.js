@@ -117,4 +117,49 @@ routerWhitelistEmail.post('/whitelist-email/upload', upload.single('file'), whit
  */
 routerWhitelistEmail.get('/whitelist-email', whitelistEmailController.listEmails);
 
+/**
+ * @swagger
+ * /api/whitelist-email/verificar/{email}:
+ *   get:
+ *     summary: Verifica si un email está autorizado para registrarse
+ *     description: |
+ *       Endpoint público consumido por el frontend Angular antes de llamar
+ *       a `supabase.auth.signUp()`. Retorna si el email existe en la whitelist
+ *       con estado `activo` y qué `tipo_usuario` tiene asignado.
+ *       Si no está habilitado, devuelve 403 con un mensaje de contacto de administración.
+ *     tags: [WhitelistEmail]
+ *     parameters:
+ *       - in: path
+ *         name: email
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: email
+ *           example: dev@example.com
+ *     responses:
+ *       200:
+ *         description: Email autorizado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 permitido: { type: boolean, example: true }
+ *                 tipo_usuario: { type: string, example: desarrollador }
+ *                 message: { type: string }
+ *       403:
+ *         description: Email no autorizado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 permitido: { type: boolean, example: false }
+ *                 tipo_usuario: { type: string, nullable: true, example: null }
+ *                 message: { type: string }
+ *       400:
+ *         description: Email con formato inválido
+ */
+routerWhitelistEmail.get('/whitelist-email/verificar/:email', whitelistEmailController.verificarEmailParaRegistro);
+
 module.exports = routerWhitelistEmail;

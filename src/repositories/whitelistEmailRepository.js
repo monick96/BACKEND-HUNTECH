@@ -109,3 +109,34 @@ exports.listEmailsRepository = async ({ estado, tipo_usuario, q, lote_id, limit 
 
     return { rows: dataRes.rows, total: countRes.rows[0].total };
 };
+
+/**
+ * Busca un email en la whitelist solo si su estado es 'activo'.
+ * Devuelve la fila o null si no existe / está revocado / ya fue usado.
+ */
+exports.buscarEmailActivoRepository = async (email) => {
+    const query = `
+        SELECT id, email, tipo_usuario, estado
+        FROM whitelist_email
+        WHERE email = $1 AND estado = 'activo'
+        LIMIT 1;
+    `;
+    const result = await pool.query(query, [email]);
+    return result.rows[0] || null;
+};
+
+/**
+ * Marca un email como 'usado' después de que el usuario completó el registro.
+ * Solo actúa si el estado actual es 'activo' (evita doble marcado).
+ * Devuelve la fila actualizada o null si no encontró nada que actualizar.
+ */
+exports.marcarEmailComoUsadoRepository = async (email) => {
+    const query = `
+        UPDATE whitelist_email
+        SET estado = 'usado', updated_at = NOW()
+        WHERE email = $1 AND estado = 'activo'
+        RETURNING id, email, estado;
+    `;
+    const result = await pool.query(query, [email]);
+    return result.rows[0] || null;
+};
