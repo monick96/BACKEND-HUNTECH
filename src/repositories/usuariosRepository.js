@@ -631,7 +631,7 @@ exports.getDesarrolladorLanguages = async (desarrollador) => {
       FROM
           idioma_x_desarrollador idx
       WHERE
-          idx.email = $1
+          idx.email_desarrollador = $1
     `; 
 
     const values = [desarrollador.email];
