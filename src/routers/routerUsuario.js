@@ -2,6 +2,12 @@ const express = require('express');
 const routerUsuario = express.Router();
 const usuarioController = require('../controllers/usuarioController')
 
+/*
+################################## ########## ##################################
+############################## USUARIOS GENÉRICOS ##############################
+################################## ########## ##################################
+*/
+
 /* Retorna 1 si existe y la tabla donde lo encontro/ lo necesito para validar 
  si debo crear al usuario en la base de datos desde el front */
 /**
@@ -64,8 +70,13 @@ routerUsuario.get('/usuario/:email/:tabla', usuarioController.readUserByEmail)
 
 routerUsuario.put('/usuario/:email', usuarioController.updateUsuarioByEmail)
 
+/*
+################################## ########## ##################################
+################################### GERENTES ###################################
+################################## ########## ##################################
+*/
 
-/* ###Gerentes### */
+
 /**
  * @swagger
  * /api/gerentes:
@@ -80,11 +91,6 @@ routerUsuario.put('/usuario/:email', usuarioController.updateUsuarioByEmail)
  *         description: Error al obtener gerentes
  */
 routerUsuario.get('/gerentes', usuarioController.readGerentes)
-
-//este no lo documento por que esta mal conceptualmente un get no debe tener un body
-//pero no se donde se esta usando asi que lo dejo por ahora , pero usamos el metodo usuatio/:email en vez de esto
-routerUsuario.get('/gerentebyemail', usuarioController.readGerenteByEmail)
-
 routerUsuario.post('/gerente', usuarioController.createGerente) 
 
 /**
@@ -112,7 +118,12 @@ routerUsuario.post('/gerente', usuarioController.createGerente)
  */
 routerUsuario.delete('/gerente', usuarioController.deleteGerente)
 
-/* ###Desarrolladores### */
+/*
+################################## ########## ##################################
+############################### DESARROLLADORES ################################
+################################## ########## ##################################
+*/
+
 /**
  * @swagger
  * /api/desarrolladores:
@@ -127,10 +138,6 @@ routerUsuario.delete('/gerente', usuarioController.deleteGerente)
  *         description: Error al obtener desarrolladores
  */
 routerUsuario.get('/desarrolladores', usuarioController.readDesarrolladores)
-//este no lo documento por que esta mal conceptualmente un get no debe tener un body
-//pero no se donde se esta usando asi que lo dejo por ahora , pero usamos el metodo usuatio/:email en vez de esto
-routerUsuario.get('/desarrolladorbyemail', usuarioController.readDesarrolladorByEmail)
-routerUsuario.get('/desarrolladorLenguajes/:email', usuarioController.readDesarrolladorLanguages)
 
 routerUsuario.post('/desarrollador', usuarioController.createDesarrollador)
 
@@ -158,11 +165,13 @@ routerUsuario.post('/desarrollador', usuarioController.createDesarrollador)
  *         description: Error al intentar eliminar el desarrollador
  */
 routerUsuario.delete('/desarrollador', usuarioController.deleteDesarrollador)//los delete no deberian usar body tampoco
-//este metodo funciona pero el que deberia usarse es routerUsuario.put('/usuario/:email', usuarioController.updateUsuarioByEmail)
-routerUsuario.put('/desarrollador/:email', usuarioController.updateDesarrolladorByEmail)
 
+/*
+################################## ########## ##################################
+############################# INSTITUCION EDUCATIVA ############################
+################################## ########## ##################################
+*/
 
-/* ###Instituciones Educativas### */
 /**
  * @swagger
  * /api/instituciones_educativas:
@@ -177,10 +186,6 @@ routerUsuario.put('/desarrollador/:email', usuarioController.updateDesarrollador
  *         description: Error al obtener instituciones
  */
 routerUsuario.get('/instituciones_educativas', usuarioController.readInstituciones)
-//este no lo documento por que esta mal conceptualmente un get no debe tener un body
-//pero no se donde se esta usando asi que lo dejo por ahora , pero usamos el metodo usuatio/:email en vez de esto
-routerUsuario.get('/institucion_educativabyemail', usuarioController.readInstitucionByEmail)
-
 
 /**
  * @swagger
@@ -208,5 +213,43 @@ routerUsuario.get('/institucion_educativabyemail', usuarioController.readInstitu
 routerUsuario.delete('/institucion_educativa', usuarioController.deleteInstitucion)
 
 routerUsuario.post('/institucion_educativa', usuarioController.createInstitucion)
+
+
+
+/*
+################################## ########## ##################################
+################################## DEPRECATED ##################################
+################################## ########## ##################################
+Cuidado. Esta parte del código está deprecada. 
+No está siendo ni debería ser usada sin un motivo claro 
+*/
+
+// ruta para obtener gerente enviando body con email 
+// Está mal conceptualmente un get no debe tener un body
+// en su lugar usar routerUsuario.get('/usuario/:email/:tabla', usuarioController.readUserByEmail)
+routerUsuario.get('/gerentebyemail', usuarioController.readGerenteByEmail)
+
+// ruta para obtener IE enviando body con email 
+// Está mal conceptualmente un get no debe tener un body
+// en su lugar usar routerUsuario.get('/usuario/:email/:tabla', usuarioController.readUserByEmail)
+routerUsuario.get('/institucion_educativabyemail', usuarioController.readInstitucionByEmail)
+
+// ruta para obtener desarrollador enviando body con email 
+// Está mal conceptualmente un get no debe tener un body
+// en su lugar usar routerUsuario.get('/usuario/:email/:tabla', usuarioController.readUserByEmail)
+routerUsuario.get('/desarrolladorbyemail', usuarioController.readDesarrolladorByEmail)
+
+// Método para editar desarrollador
+// Funciona, pero el que deberia usarse es routerUsuario.put('/usuario/:email', usuarioController.updateUsuarioByEmail)
+routerUsuario.put('/desarrollador/:email', usuarioController.updateDesarrolladorByEmail)
+
+// ruta para traer idiomas asociados a un desarrollador. 
+// Deprecada, ahora esa función está cubierta por routerUsuario.get('/usuario/:email/:tabla', usuarioController.readUserByEmail)
+routerUsuario.get('/desarrolladorLenguajes/:email', usuarioController.readDesarrolladorLanguages)
+
+
+
+
+
 
 module.exports = routerUsuario;
