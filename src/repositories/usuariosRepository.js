@@ -6,8 +6,13 @@ const pool = require("../dataBase/conexionPostgres");
 const crypto = require('crypto');//lo dejo por ahora pero se supone que deberia recibir ids desde el auth
 const { TABLAS_PERMITIDAS } = require("../utils/constants");
 
-/* ############# USUARIOS EN GENERAL ############# */
+/*
+################################## ########## ##################################
+############################## USUARIOS GENÉRICOS ##############################
+################################## ########## ##################################
+*/
 
+// Devuelve (como booleano?) si existe un usuario con el email enviado en alguna de las tres tablas.
 exports.chequearSiExisteUsuarioConEmail = async (usuario) => {
  
   try {
@@ -37,7 +42,7 @@ exports.chequearSiExisteUsuarioConEmail = async (usuario) => {
   }
 };
 
-//este devuelve tambien el nombre de la tabla en que encontro el email
+// Similar al anterior pero devuelve también el nombre de la tabla en la que encontro el usuario con el email enviado
 exports.chequearSiExisteUsuarioConEmailRetornarNombreTabla = async (email) => {
  
   try {
@@ -75,7 +80,50 @@ exports.chequearSiExisteUsuarioConEmailRetornarNombreTabla = async (email) => {
 
 };
 
-//actualiza cualquier tipo de usuario por email y retorna todo el objeto actualizado
+// Este método es el único completo y en funciones para get de usuarios, sea Gerente, Desarrollador o IE.
+// Devuelve objeto usuario tomando de parámetros strings email y nombre de tabla
+exports.getUserByEmailRepository = async (email, tabla) => {
+  try {
+    if (!TABLAS_PERMITIDAS.includes(tabla)) {
+      throw Error('Tabla no permitida');
+    }
+    // obbtenemos los datos para gerentes, devs e instituciones
+    const queryPrincipal = `SELECT * FROM ${tabla} WHERE email = $1`;
+    const resultPrincipal = await pool.query(queryPrincipal, [email]);
+    let usuarioBase = resultPrincipal.rows[0];
+
+    // si usuario no existe en la DB o si no es desarrollador, 
+    // cortamos la ejecución y devolvemos 
+    if (!usuarioBase || tabla !== 'desarrollador') {
+      return usuarioBase;
+    }
+
+    // Concurrencia:
+    // Dos consultas en paralelo.
+    // Si el user es desarrollador:
+    const [resultadosIdiomas, resultadosHabilidades] = await Promise.all([
+      pool.query("SELECT nombre_idioma, nivel_idioma FROM idioma_x_desarrollador WHERE email_desarrollador = $1", [email]),
+      pool.query("SELECT nombre_habilidad, nivel_habilidad FROM habilidad_x_desarrollador WHERE email_desarrollador = $1", [email])
+    ]);
+
+    // asocio al usuario los resultados , para que lo maneje el front
+    usuarioBase.idiomas = resultadosIdiomas.rows;
+    usuarioBase.habilidades = resultadosHabilidades.rows;
+
+    return usuarioBase;
+
+  } catch (error) {
+
+    console.error(
+      "REPOSITORY - Error al obtener el usuario solicitado: " + error
+    );
+
+    throw Error(error.message);
+
+  } 
+};
+
+// Actualiza cualquier tipo de usuario por email y retorna todo el objeto actualizado
 exports.updateUsuarioByEmailRepository = async (email, usuario) => {
 
   //el front ya sabe el tipo de usuario así que lo puede mandar desde el form
@@ -210,10 +258,12 @@ exports.updateUsuarioByEmailRepository = async (email, usuario) => {
 
 };
 
-////metodo transaccional(si algo falla que falle todo y no cambie nada) para update dev por las tablas nuevas idioma y habilidades
-//solo se utiliza en el repositorio asi que no uso exports
+// Método transaccional (si algo falla que falle todo y no cambie nada) para update dev por las tablas nuevas idioma y habilidades
+// Solo se utiliza en el repositorio (es llamado por updateUsuarioByEmailRepository) asi que no hay export para este método.
+
 const updateDesarrolladorTransaccional = async (email, usuario) => {
-  const client = await pool.connect();//este pool se encarga de principio a fin de esta operacion update
+  //este pool se encarga de principio a fin de esta operacion update
+  const client = await pool.connect(); 
 
   try {
     await client.query('BEGIN');
@@ -378,6 +428,8 @@ const updateDesarrolladorTransaccional = async (email, usuario) => {
   }
 };
 
+// update las habilidades de un desarrollador
+// función sin export, solo es calleada por updateDesarrolladorTransaccional
 const sincronizarHabilidades = async (client, email, habilidadesFrontend) => {
   // obtenemos el estado actual de habilidades en la base de datos de ese email
   const resDB = await client.query(
@@ -420,6 +472,8 @@ const sincronizarHabilidades = async (client, email, habilidadesFrontend) => {
 };
 
 // update los idiomas de un desarrollador
+// función sin export, solo es calleada por updateDesarrolladorTransaccional
+
 const sincronizarIdiomas = async (client, email, idiomasFrontend) => {
   // idiomas del dev en db
   const resDB = await client.query(
@@ -461,7 +515,11 @@ const sincronizarIdiomas = async (client, email, idiomasFrontend) => {
   }
 };
 
-/* ############# GERENTES ############# */
+/*
+################################## ########## ##################################
+################################### GERENTES ###################################
+################################## ########## ##################################
+*/
 
 exports.getAllGerentesRepository = async () => {
 
@@ -479,28 +537,6 @@ exports.getAllGerentesRepository = async () => {
   } 
 };
 
-exports.getGerenteByEmailRepository = async (gerente) => {
-
-  try {
-
-    const query = `SELECT * FROM gerente WHERE email = $1`;
-
-    const values = [gerente.email];
-
-    const result = await pool.query(query, values);
-
-    return result.rows;
-
-  } catch (error) {
-
-    console.error(
-      "REPOSITORY - Error al obtener el gerente solicitado: " + error
-    );
-
-    throw Error(error.message);
-
-  }
-};
 
 exports.createGerenteRepository = async (gerente) => {
 
@@ -563,7 +599,12 @@ exports.deleteGerenteRepository = async (gerente) => {
 
 };
 
-/* ############# DESARROLLADORES ############# */
+/*
+################################## ########## ##################################
+############################### DESARROLLADORES ################################
+################################## ########## ##################################
+*/
+
 
 exports.getAllDesarrolladoresRepository = async () => {
   
@@ -587,72 +628,6 @@ exports.getAllDesarrolladoresRepository = async () => {
 
   } 
 };
-
-exports.getDesarrolladorByEmailRepository = async (desarrollador) => {
-
-  try {
-
-    const query = `
-      SELECT
-          *
-      FROM
-          desarrollador
-      WHERE
-          desarrollador.email = $1
-    `; 
-
-    const values = [desarrollador.email];
-
-    const result = await pool.query(
-      query, values
-    );
-
-    return result.rows;
-
-  } catch (error) {
-
-    console.error(
-      "REPOSITORY - Error al obtener el desarrollador solicitado: " + error
-    );
-
-    throw Error(error.message);
-
-  }
-
-};
-
-exports.getDesarrolladorLanguages = async (email_desarrollador) => {
-
-    try {
-
-    const query = `
-      SELECT
-          *
-      FROM
-          idioma_x_desarrollador idx
-      WHERE
-          idx.email_desarrollador = $1
-    `; 
-
-    const values = [email_desarrollador];
-
-    const result = await pool.query(
-      query, values
-    );
-
-    return result.rows;
-
-  } catch (error) {
-
-    console.error(
-      "REPOSITORY - Error al obtener el desarrollador solicitado: " + error
-    );
-
-    throw Error(error.message);
-
-  }
-
-}
 
 exports.createDesarrolladorRepository = async (desarrollador) => {
 
@@ -715,69 +690,14 @@ exports.deleteDesarrolladorRepository = async (desarrollador) => {
 
 };
 
-//actualiza desarrollador por email y retorna todo el objeto actualizado
-/* MÉTODO DEPRECADO AHORA RUTIAMOS TODOS LOS PUT DE USUARIO POR EL MÉTODO GENÉRICO DE USUARIO */
-//lo migro y dejo por si en alguna parte se sigue usando
-exports.updateDesarrolladorByEmailRepository = async (email, desarrollador) => {
-  try {
 
-    return await this.updateUsuarioByEmailRepository(email, { ...desarrollador, rol: "desarrollador" });
 
-  } catch (error) {
+/*
+################################## ########## ##################################
+############################# INSTITUCION EDUCATIVA ############################
+################################## ########## ##################################
+*/
 
-    console.error("REPOSITORY - Error al actualiza desarrollador: " + error.message);
-    throw Error("Error al actualizar desarrollador: " + error.message);
-
-  }
-};
-
-//objeto usuario con email y nombre de la tabla
-exports.getUserByEmailRepository = async (email, tabla) => {
- 
-
-  try {
-
-    if (!TABLAS_PERMITIDAS.includes(tabla)) {
-      throw Error('Tabla no permitida');
-    }
-
-    // obbtenemos los datos para gerentes, devs e instituciones
-    const queryPrincipal = `SELECT * FROM ${tabla} WHERE email = $1`;
-    const resultPrincipal = await pool.query(queryPrincipal, [email]);
-    let usuarioBase = resultPrincipal.rows[0];
-
-    // si usuario no existe en la DB o si no es desarrollador, 
-    // cortamos la ejecución y devolvemos 
-    if (!usuarioBase || tabla !== 'desarrollador') {
-      return usuarioBase;
-    }
-
-    //voy a usar lo aprendido en concurrencia 
-    // y voy a lanzar dos consultas en paralelo para que no sea tan lento
-    //si el user es desarrollador
-    const [resultadosIdiomas, resultadosHabilidades] = await Promise.all([
-      pool.query("SELECT nombre_idioma, nivel_idioma FROM idioma_x_desarrollador WHERE email_desarrollador = $1", [email]),
-      pool.query("SELECT nombre_habilidad, nivel_habilidad FROM habilidad_x_desarrollador WHERE email_desarrollador = $1", [email])
-    ]);
-
-    // asocio al usuario los resultados , para que lo maneje el front
-    usuarioBase.idiomas = resultadosIdiomas.rows;
-    usuarioBase.habilidades = resultadosHabilidades.rows;
-
-    return usuarioBase;
-
-  } catch (error) {
-
-    console.error(
-      "REPOSITORY - Error al obtener el usuario solicitado: " + error
-    );
-
-    throw Error(error.message);
-
-  } 
-};
-
-/* ############# INSTITUCIONES EDUCATIVAS ############# */
 exports.getAllInstitucionesRepository = async () => {
  
   try {
@@ -800,36 +720,6 @@ exports.getAllInstitucionesRepository = async () => {
 
   }
 };
-
-exports.getInstitucionByEmailRepository = async (institucion) => {
-
-  try {
-    
-    const query = `
-      SELECT
-          *
-      FROM
-          institucion_educativa
-      WHERE
-          email = $1
-    `;
-
-    const values = [institucion.email];
-
-    const result = await pool.query(query, values);
-
-    return result.rows;
-
-  } catch (error) {
-
-    console.error(
-      "REPOSITORY - Error al obtener la institucion educativa solicitada: " + error
-    );
-    throw Error(error.message);
-
-  }
-};
-
 
 exports.createInstitucionRepository = async (institucion) => {
 
@@ -884,4 +774,123 @@ exports.deleteInstitucionRepository = async (institucion) => {
 
   }
 
+};
+
+
+
+/*
+################################## ########## ##################################
+################################## DEPRECATED ##################################
+################################## ########## ##################################
+Cuidado. Esta parte del código está deprecada. 
+No está siendo ni debería ser usada sin un motivo claro 
+*/
+
+// Actualiza desarrollador por email y retorna todo el objeto actualizado
+exports.updateDesarrolladorByEmailRepository = async (email, desarrollador) => {
+  try {
+    return await this.updateUsuarioByEmailRepository(email, { ...desarrollador, rol: "desarrollador" });
+  } catch (error) {
+    console.error("REPOSITORY - Error al actualiza desarrollador: " + error.message);
+    throw Error("Error al actualizar desarrollador: " + error.message);
+  }
+};
+
+// Una ruta para hacer get de idiomas para desarrollador. Deprecada, usar getUserByEmailRepository()
+exports.getDesarrolladorLanguages = async (email_desarrollador) => {
+    try {
+    const query = `
+      SELECT
+          *
+      FROM
+          idioma_x_desarrollador idx
+      WHERE
+          idx.email_desarrollador = $1
+    `; 
+    const values = [email_desarrollador];
+    const result = await pool.query(
+      query, values
+    );
+    return result.rows;
+  } catch (error) {
+    console.error(
+      "REPOSITORY - Error al obtener el desarrollador solicitado: " + error
+    );
+    throw Error(error.message);
+  }
+}
+
+// Una ruta para hacer get de desarrollador con email por parámetros. Deprecada, usar getUserByEmailRepository()
+exports.getDesarrolladorByEmailRepository = async (desarrollador) => {
+  try {
+    const query = `
+      SELECT
+          *
+      FROM
+          desarrollador
+      WHERE
+          desarrollador.email = $1
+    `; 
+    const values = [desarrollador.email];
+    const result = await pool.query(
+      query, values
+    );
+    return result.rows;
+  } catch (error) {
+
+    console.error(
+      "REPOSITORY - Error al obtener el desarrollador solicitado: " + error
+    );
+    throw Error(error.message);
+  }
+};
+
+
+// Trae un gerente. Era un incorrecto get con body.
+// Reemplazado por el correcto y completo getUserByEmailRepository
+
+exports.getGerenteByEmailRepository = async (gerente) => {
+  try {
+    const query = `SELECT * FROM gerente WHERE email = $1`;
+    const values = [gerente.email];
+    const result = await pool.query(query, values);
+    return result.rows;
+  } catch (error) {
+    console.error(
+      "REPOSITORY - Error al obtener el gerente solicitado: " + error
+    );
+    throw Error(error.message);
+  }
+};
+
+// Trae una IE. Era un incorrecto get con body.
+// Reemplazado por el correcto y completo getUserByEmailRepository
+
+exports.getInstitucionByEmailRepository = async (institucion) => {
+
+  try {
+    
+    const query = `
+      SELECT
+          *
+      FROM
+          institucion_educativa
+      WHERE
+          email = $1
+    `;
+
+    const values = [institucion.email];
+
+    const result = await pool.query(query, values);
+
+    return result.rows;
+
+  } catch (error) {
+
+    console.error(
+      "REPOSITORY - Error al obtener la institucion educativa solicitada: " + error
+    );
+    throw Error(error.message);
+
+  }
 };

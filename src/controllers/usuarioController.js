@@ -1,5 +1,11 @@
 const usuariosService = require('../services/usuariosService')
 
+/*
+################################## ########## ##################################
+############################## USUARIOS GENÉRICOS ##############################
+################################## ########## ##################################
+*/
+
 exports.readUsuarioExistByEmail = async (req, res) => {
     try {
         let { email } = req.params;
@@ -55,6 +61,38 @@ exports.updateUsuarioByEmail = async (req, res) => {
     }
 }
 
+exports.readUserByEmail = async (req, res) => {
+    try {
+        let { email, tabla } = req.params;
+
+        result = await usuariosService.getUserByEmail(email, tabla);
+
+        if (result.length === 0) {
+            return res.status(404).json({
+                message: 'No hay ningún usuario en ' + tabla + ' con ese email',
+                count: 0,
+                data: []
+            });
+        }
+
+        return res.status(200).json({
+            message: 'Usuario obtenido correctamente',
+            count: result.length,
+            data: result
+        });
+
+    } catch (error) {
+        console.error('Error al obtener Usuario: ' + error);
+        res.status(500)
+        res.json({ error: 'Error al obtener Usuario: ' + error.message });
+    }
+}
+
+/*
+################################## ########## ##################################
+################################### GERENTES ###################################
+################################## ########## ##################################
+*/
 
 exports.readGerentes = async (req, res) => {
     try {
@@ -70,31 +108,6 @@ exports.readGerentes = async (req, res) => {
         console.error('Error al obtener gerentes: ' + error);
         res.status(500)
         res.json({ error: 'Error al obtener gerentes: ' + error.message });
-    }
-}
-
-exports.readGerenteByEmail = async (req, res) => {
-    try {
-        let gerente = req.body;
-        result = await usuariosService.getGerenteByEmail(gerente)
-        res.status(200);
-        if (result.length == 0) {
-            res.json({
-                message: 'No hay ningún gerente con ese email',
-                count: result.length,
-                data: result
-            });
-        } else {
-            res.json({
-                message: 'gerente hallado',
-                count: result.length,
-                data: result
-            });
-        }
-    } catch (error) {
-        console.error('Error al obtener el gerente: ' + error);
-        res.status(500)
-        res.json({ error: 'Error al obtener el gerente: ' + error.message });
     }
 }
 
@@ -135,7 +148,11 @@ exports.deleteGerente = async (req, res) => {
     }
 }
 
-/* ############# DESARROLLADORES ############# */
+/*
+################################## ########## ##################################
+############################### DESARROLLADORES ################################
+################################## ########## ##################################
+*/
 
 exports.readDesarrolladores = async (req, res) => {
     try {
@@ -151,58 +168,6 @@ exports.readDesarrolladores = async (req, res) => {
         console.error('Error al obtener desarrolladores: ' + error);
         res.status(500)
         res.json({ error: 'Error al obtener desarrolladores: ' + error.message });
-    }
-}
-
-exports.readDesarrolladorByEmail = async (req, res) => {
-    try {
-        let desarrollador = req.body;
-        result = await usuariosService.getDesarrolladorByEmail(desarrollador)
-        res.status(200);
-        if (result.length == 0) {
-            res.json({
-                message: 'No hay ningún desarrollador con ese email',
-                count: result.length,
-                data: result
-            });
-        } else {
-            res.json({
-                message: 'desarrollador hallado',
-                count: result.length,
-                data: result
-            });
-        }
-    } catch (error) {
-        console.error('Error al obtener el desarrollador: ' + error);
-        res.status(500)
-        res.json({ error: 'Error al obtener el desarrollador: ' + error.message });
-    }
-}
-
-exports.readDesarrolladorLanguages = async (req, res) => {
-    try {
-        let { email } = req.params;
-
-        result = await usuariosService.getDesarrolladorLanguages(email);
-
-        if (result.length === 0) {
-            return res.status(404).json({
-                message: 'No hay idiomas cargados para ese desarrollador',
-                count: 0,
-                data: []
-            });
-        }
-
-        return res.status(200).json({
-            message: 'idiomas cargados correctamente',
-            count: result.length,
-            data: result
-        });
-
-    } catch (error) {
-        console.error('Error al obtener idiomas: ' + error);
-        res.status(500)
-        res.json({ error: 'Error al obtener idiomas: ' + error.message });
     }
 }
 
@@ -242,53 +207,12 @@ exports.deleteDesarrollador = async (req, res) => {
     }
 }
 
-exports.updateDesarrolladorByEmail = async (req, res) => {
-    try {
-        let { email } = req.params;
-        let desarrollador = req.body;
+/*
+################################## ########## ##################################
+############################# INSTITUCION EDUCATIVA ############################
+################################## ########## ##################################
+*/
 
-        let result = await usuariosService.updateDesarrolladorByEmail(email, desarrollador);
-
-        res.status(200);
-        res.json({ message: 'desarrollador actualizado', data: result });
-
-    }
-    catch (error) {
-        console.error('Error al actualizar desarrollador: ' + error);
-        res.status(500)
-        res.json({ error: 'Error al actualizar desarrollador: ' + error.message });
-    }
-}
-
-exports.readUserByEmail = async (req, res) => {
-    try {
-        let { email, tabla } = req.params;
-
-        result = await usuariosService.getUserByEmail(email, tabla);
-
-        if (result.length === 0) {
-            return res.status(404).json({
-                message: 'No hay ningún usuario en ' + tabla + ' con ese email',
-                count: 0,
-                data: []
-            });
-        }
-
-        return res.status(200).json({
-            message: 'Usuario obtenido correctamente',
-            count: result.length,
-            data: result
-        });
-
-    } catch (error) {
-        console.error('Error al obtener Usuario: ' + error);
-        res.status(500)
-        res.json({ error: 'Error al obtener Usuario: ' + error.message });
-    }
-}
-
-
-/* INSTITUCIONES EDUCATIVAS */
 exports.readInstituciones = async(req, res)=>{
     try {
         result = await usuariosService.getAllInstituciones(),
@@ -303,29 +227,6 @@ exports.readInstituciones = async(req, res)=>{
         console.error('Error al obtener instituciones educativas: ' + error);
         res.status(500)
         res.json({ error: 'Error al obtener instituciones educativas: '+ error.message });
-    }
-}
-
-exports.readInstitucionByEmail = async(req, res) => {
-    try {
-        let institucion = req.body;
-        result = await usuariosService.getInstitucionByEmail(institucion)
-        res.status(201);       
-        if (result.length == 0) {
-        res.json({ 
-            message: 'No hay ninguna institución educativa con ese email',
-            count: result.length,
-            data:result });    
-        } else {
-            res.json({ 
-            message: 'institución educativa hallada',
-            count: result.length,
-            data:result });
-        }
-    } catch (error) {
-        console.error('Error al obtener institución educativa: ' + error);
-        res.status(500)
-        res.json({ error: 'Error al obtener institución educativa: '+ error.message });
     }
 }
 
@@ -362,5 +263,142 @@ exports.deleteInstitucion = async(req, res)=>{
         console.error('Error al eliminar institucion educativa: ' + error);
         res.status(500)
         res.json({ error: 'Error al eliminar institucion educativa: '+ error.message });
+    }
+}
+
+/*
+################################## ########## ##################################
+################################## DEPRECATED ##################################
+################################## ########## ##################################
+Cuidado. Esta parte del código está deprecada. 
+No está siendo ni debería ser usada sin un motivo claro 
+*/
+
+// Trae lenguajes de un dev. Reemplazado por el completo readUserByEmail
+exports.readDesarrolladorLanguages = async (req, res) => {
+    try {
+        let { email } = req.params;
+
+        result = await usuariosService.getDesarrolladorLanguages(email);
+
+        if (result.length === 0) {
+            return res.status(404).json({
+                message: 'No hay idiomas cargados para ese desarrollador',
+                count: 0,
+                data: []
+            });
+        }
+
+        return res.status(200).json({
+            message: 'idiomas cargados correctamente',
+            count: result.length,
+            data: result
+        });
+
+    } catch (error) {
+        console.error('Error al obtener idiomas: ' + error);
+        res.status(500)
+        res.json({ error: 'Error al obtener idiomas: ' + error.message });
+    }
+}
+
+// Trae un gerente. Era un incorrecto get con body.
+// Reemplazado por el correcto y completo readUserByEmail
+exports.readGerenteByEmail = async (req, res) => {
+    try {
+        let gerente = req.body;
+        result = await usuariosService.getGerenteByEmail(gerente)
+        res.status(200);
+        if (result.length == 0) {
+            res.json({
+                message: 'No hay ningún gerente con ese email',
+                count: result.length,
+                data: result
+            });
+        } else {
+            res.json({
+                message: 'gerente hallado',
+                count: result.length,
+                data: result
+            });
+        }
+    } catch (error) {
+        console.error('Error al obtener el gerente: ' + error);
+        res.status(500)
+        res.json({ error: 'Error al obtener el gerente: ' + error.message });
+    }
+}
+
+// Trae una IE. Era un incorrecto get con body.
+// Reemplazado por el correcto y completo readUserByEmail
+
+exports.readInstitucionByEmail = async(req, res) => {
+    try {
+        let institucion = req.body;
+        result = await usuariosService.getInstitucionByEmail(institucion)
+        res.status(201);       
+        if (result.length == 0) {
+        res.json({ 
+            message: 'No hay ninguna institución educativa con ese email',
+            count: result.length,
+            data:result });    
+        } else {
+            res.json({ 
+            message: 'institución educativa hallada',
+            count: result.length,
+            data:result });
+        }
+    } catch (error) {
+        console.error('Error al obtener institución educativa: ' + error);
+        res.status(500)
+        res.json({ error: 'Error al obtener institución educativa: '+ error.message });
+    }
+}
+
+// Trae un dev. Era un incorrecto get con body.
+// Reemplazado por el correcto y completo readUserByEmail
+
+exports.readDesarrolladorByEmail = async (req, res) => {
+    try {
+        let desarrollador = req.body;
+        result = await usuariosService.getDesarrolladorByEmail(desarrollador)
+        res.status(200);
+        if (result.length == 0) {
+            res.json({
+                message: 'No hay ningún desarrollador con ese email',
+                count: result.length,
+                data: result
+            });
+        } else {
+            res.json({
+                message: 'desarrollador hallado',
+                count: result.length,
+                data: result
+            });
+        }
+    } catch (error) {
+        console.error('Error al obtener el desarrollador: ' + error);
+        res.status(500)
+        res.json({ error: 'Error al obtener el desarrollador: ' + error.message });
+    }
+}
+
+// Edita un dev. Reemplazado por el amplio updateUsuarioByEmail
+
+exports.updateDesarrolladorByEmail = async (req, res) => {
+    try {
+        let { email } = req.params;
+        let desarrollador = req.body;
+
+        let result = await usuariosService.updateDesarrolladorByEmail(email, desarrollador);
+
+        res.status(200);
+        res.json({ message: 'desarrollador actualizado', data: result });
+
+    }
+    catch (error) {
+        console.error('Error al actualizar desarrollador: ' + error);
+        res.status(500)
+        res.json({ error: 'Error al actualizar desarrollador: ' + error.message });
     }
 }
