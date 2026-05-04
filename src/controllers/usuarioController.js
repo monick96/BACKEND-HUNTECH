@@ -181,22 +181,24 @@ exports.readDesarrolladorByEmail = async (req, res) => {
 
 exports.readDesarrolladorLanguages = async (req, res) => {
     try {
-        let desarrollador = req.body;
-        result = await usuariosService.getDesarrolladorLanguages(desarrollador)
-        res.status(200);
-        if (result.length == 0) {
-            res.json({
-                message: 'El desarrollador no tiene idiomas cargados',
-                count: result.length,
-                data: result
-            });
-        } else {
-            res.json({
-                message: 'Idiomas hallados para el desarrollador',
-                count: result.length,
-                data: result
+        let { email } = req.params;
+
+        result = await usuariosService.getDesarrolladorLanguages(email);
+
+        if (result.length === 0) {
+            return res.status(404).json({
+                message: 'No hay idiomas cargados para ese desarrollador',
+                count: 0,
+                data: []
             });
         }
+
+        return res.status(200).json({
+            message: 'idiomas cargados correctamente',
+            count: result.length,
+            data: result
+        });
+
     } catch (error) {
         console.error('Error al obtener idiomas: ' + error);
         res.status(500)
