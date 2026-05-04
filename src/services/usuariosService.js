@@ -149,18 +149,20 @@ exports.updateDesarrolladorByEmail = async (email, desarrollador) => {
   }
 };
 
-exports.getDesarrolladorLanguages = async (desarrollador) => {
+exports.getDesarrolladorLanguages = async (email) => {
   try {
-    if (!desarrollador.email) {
-      throw Error("Se debe indicar el email del desarrollador para ver sus idiomas");
+
+    if (!email) {
+      throw Error("No se ingresó email del desarrollador");
     }
-    return await usuariosRepository.getDesarrolladorLanguages(desarrollador);
+
+    return await usuariosRepository.getDesarrolladorLanguages(email);
 
   } catch (error) {
 
-    console.error("SERVICE - Error al actualizar desarrollador: " + error);
+    console.error("SERVICE - Error al buscar usuario: " + error);
+    throw Error("Error al buscar usuario: " + error.message);
 
-    throw Error(error.message);
   }
 };
 
