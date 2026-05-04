@@ -130,6 +130,7 @@ routerUsuario.get('/desarrolladores', usuarioController.readDesarrolladores)
 //este no lo documento por que esta mal conceptualmente un get no debe tener un body
 //pero no se donde se esta usando asi que lo dejo por ahora , pero usamos el metodo usuatio/:email en vez de esto
 routerUsuario.get('/desarrolladorbyemail', usuarioController.readDesarrolladorByEmail)
+routerUsuario.get('/desarrolladorLenguajes', usuarioController.readDesarrolladorLanguages)
 routerUsuario.post('/desarrollador', usuarioController.createDesarrollador)
 
 /**

@@ -621,6 +621,39 @@ exports.getDesarrolladorByEmailRepository = async (desarrollador) => {
 
 };
 
+exports.getDesarrolladorLanguages = async (desarrollador) => {
+
+    try {
+
+    const query = `
+      SELECT
+          *
+      FROM
+          idioma_x_desarrollador idx
+      WHERE
+          idx.email = $1
+    `; 
+
+    const values = [desarrollador.email];
+
+    const result = await pool.query(
+      query, values
+    );
+
+    return result.rows;
+
+  } catch (error) {
+
+    console.error(
+      "REPOSITORY - Error al obtener el desarrollador solicitado: " + error
+    );
+
+    throw Error(error.message);
+
+  }
+
+}
+
 exports.createDesarrolladorRepository = async (desarrollador) => {
 
   try {
