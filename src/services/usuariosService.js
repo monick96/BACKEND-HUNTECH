@@ -149,6 +149,22 @@ exports.updateDesarrolladorByEmail = async (email, desarrollador) => {
   }
 };
 
+exports.getDesarrolladorLanguages = async (desarrollador) => {
+  try {
+    if (!desarrollador.email) {
+      throw Error("Se debe indicar el email del desarrollador para ver sus idiomas");
+    }
+    return await usuariosRepository.getDesarrolladorLanguages(desarrollador);
+
+  } catch (error) {
+
+    console.error("SERVICE - Error al actualizar desarrollador: " + error);
+
+    throw Error(error.message);
+  }
+};
+
+
 exports.deleteDesarrollador = async (desarrollador) => {
   try {
     if (!desarrollador.email) {
