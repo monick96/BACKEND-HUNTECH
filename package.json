@@ -20,6 +20,8 @@
   },
   "homepage": "https://github.com/monick96/BACKEND-HUNTECH#readme",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1049.0",
+    "@aws-sdk/s3-request-presigner": "^3.1049.0",
     "cors": "^2.8.5",
     "csv-parse": "^6.2.1",
     "dotenv": "^17.2.3",
