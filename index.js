@@ -9,7 +9,9 @@ const routerCareerDev = require('./src/routers/routerCarrerDev');
 const routerProyecto = require('./src/routers/routerProyecto');
 const routerUsuario = require('./src/routers/routerUsuario');
 const routerContrato = require('./src/routers/routerContrato');
+const routerPortfolio = require('./src/routers/routerPortfolio')
 const routerWhitelistEmail = require('./src/routers/routerWhitelistEmail');
+
 
 //librerías de Swagger
 const swaggerUi = require('swagger-ui-express');
@@ -27,6 +29,9 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 app.use(cors({
     origin: allowedOrigins
 }));
+
+app.use(bodyParser.json({ limit: '6mb' })); // permitir payloads de hasta 6mb en JSON
+
 
 // configuración de Swagger
 const swaggerOptions = {
@@ -96,6 +101,10 @@ app.use('/api', routerUsuario)
 
 //whitelist de emails autorizados a registrarse
 app.use('/api', routerWhitelistEmail);
+
+//la api para crear portfolios y subirles imágenes
+app.use('/api/portfolios', routerPortfolio);
+
 
 //inicia server y escucha solicitudes
 //3 parametros=> puerto, hostname, callback
