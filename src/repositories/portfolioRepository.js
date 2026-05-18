@@ -1,29 +1,29 @@
 const pool = require("../dataBase/conexionPostgres");
 
-export async function createPortfolio(client, { titulo, descripcion }) {
+exports.createPortfolio = async (client, { titulo, descripcion }) => {
   const q = `INSERT INTO portfolio (titulo, descripcion) VALUES ($1, $2) RETURNING id, titulo, descripcion, imagenes, created_at`;
   const r = await client.query(q, [titulo, descripcion]);
   return r.rows[0];
 }
 
-export async function linkDeveloperToPortfolio(client, { desarrollador_email, portfolio_id }) {
+exports.linkDeveloperToPortfolio = async (client, { desarrollador_email, portfolio_id }) => {
   const q = `INSERT INTO desarrollador_x_portfolio (desarrollador_email, portfolio_id) VALUES ($1, $2)`;
   await client.query(q, [desarrollador_email, portfolio_id]);
 }
 
-export async function countPortfoliosByDeveloper(client, desarrollador_email) {
+exports.countPortfoliosByDeveloper = async (client, desarrollador_email) => {
   const q = `SELECT COUNT(*)::int as cnt FROM desarrollador_x_portfolio WHERE desarrollador_email = $1`;
   const r = await client.query(q, [desarrollador_email]);
   return r.rows[0].cnt;
 }
 
-export async function getPortfolioById(client, id) {
+exports.getPortfolioById = async (client, id) => {
   const q = `SELECT * FROM portfolio WHERE id = $1`;
   const r = await client.query(q, [id]);
   return r.rows[0];
 }
 
-export async function getImageCountForPortfolioForUpdate(client, portfolioId) {
+exports.getImageCountForPortfolioForUpdate = async (client, portfolioId) => {
   // bloquea la row para evitar race conditions
   const q = `SELECT imagenes FROM portfolio WHERE id = $1 FOR UPDATE`;
   const r = await client.query(q, [portfolioId]);
@@ -31,7 +31,7 @@ export async function getImageCountForPortfolioForUpdate(client, portfolioId) {
   return arr.length;
 }
 
-export async function appendImageToPortfolio(client, portfolioId, imageUrl) {
+exports.appendImageToPortfolio = async (client, portfolioId, imageUrl) => {
   const q = `
     UPDATE portfolio
     SET imagenes = array_append(imagenes, $2)
@@ -43,7 +43,7 @@ export async function appendImageToPortfolio(client, portfolioId, imageUrl) {
   return r.rows[0].imagenes;
 }
 
-export async function removeImageFromPortfolio(client, portfolioId, imageUrl) {
+exports.removeImageFromPortfolio = async (client, portfolioId, imageUrl) => {
   const q = `
     UPDATE portfolio
     SET imagenes = array_remove(imagenes, $2)
