@@ -30,6 +30,7 @@ app.use(cors({
     origin: allowedOrigins
 }));
 
+const bodyParser = require('body-parser');
 app.use(bodyParser.json({ limit: '6mb' })); // permitir payloads de hasta 6mb en JSON
 
 
