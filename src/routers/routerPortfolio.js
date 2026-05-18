@@ -9,8 +9,8 @@ router.post('/presigned-urls', portfolioController.getPresignedUrls);
 // Ruta para salvar el portfolio final y linkearlo al desarrollador.
 // armé todas las rutas sin el requireAuth a ver si podemos no usarlo.
 router.post('/', portfolioController.createPortfolio);
-router.post('/:id/presign', controller.presign);
-router.post('/:id/confirm-upload',  controller.confirmUpload);
+router.post('/:id/presign', portfolioController.presign);
+router.post('/:id/confirm-upload', portfolioController.confirmUpload);
 
 
 
