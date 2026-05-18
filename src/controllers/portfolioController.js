@@ -1,6 +1,25 @@
-const portfolioService = require('../services/portfolio.service');
 
-const getPresignedUrls = async (req, res, next) => {
+const portfolioService = require("../services/portfolioService")
+
+exports.readContracts = async (req, res) => {
+  try {
+    (result = await contractService.getAllContracts()),
+
+      res.status(200);
+    res.json({
+      message: "contratos obtenidos correctamente",
+      count: result.length,
+      data: result,
+
+    });
+  } catch (error) {
+    console.error("Error al obtener contratos: " + error);
+    res.status(500);
+    res.json({ error: "Error al obtener contratos: " + error.message });
+  }
+};
+
+exports.getPresignedUrls = async (req, res, next) => {
     try {
         const { files } = req.body; // Array of { fileName, fileType }
         if (!files || files.length > 3) {
@@ -13,7 +32,7 @@ const getPresignedUrls = async (req, res, next) => {
     }
 };
 
-const createPortfolio = async (req, res, next) => {
+exports.createPortfolio = async (req, res, next) => {
     try {
         const { email, titulo, descripcion, imagenes } = req.body;
         
@@ -31,7 +50,7 @@ const createPortfolio = async (req, res, next) => {
     }
 };
 
-export async function presign(req, res, next) {
+exports.presign = async (req, res, next) => {
   try {
     const desarrollador_email = req.user.email;
     const portfolioId = Number(req.params.id);
@@ -46,7 +65,7 @@ export async function presign(req, res, next) {
   }
 }
 
-export async function confirmUpload(req, res, next) {
+exports.confirmUpload = async (req, res, next) => {
   try {
     const desarrollador_email = req.user.email;
     const portfolioId = Number(req.params.id);
@@ -60,7 +79,3 @@ export async function confirmUpload(req, res, next) {
     next(err);
   }
 }
-
-
-
-module.exports = { getPresignedUrls, createPortfolio, presign, confirmUpload };

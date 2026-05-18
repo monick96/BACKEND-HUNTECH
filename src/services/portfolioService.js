@@ -1,13 +1,13 @@
-const pool = require("../dataBase/conexionPostgres.js");
-const portfolioRepository = require('../repositories/portfolioRepository.js')
-const s3Service = require('./s3Service.js')
+const pool = require("../dataBase/conexionPostgres.js")
+const portfolioRepository = require('../repositories/portfolioRepository')
+const s3Service = require('./s3Service')
 
 const MAX_PORTFOLIOS_PER_DEV = 3;
 const MAX_IMAGES_PER_PORTFOLIO = 3;
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 const ALLOWED_CONTENT_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
-export async function createPortfolio({ desarrollador_email, titulo, descripcion }) {
+exports.createPortfolio = async ({ desarrollador_email, titulo, descripcion }) => {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
@@ -27,7 +27,7 @@ export async function createPortfolio({ desarrollador_email, titulo, descripcion
   }
 }
 
-export async function generatePresign({ desarrollador_email, portfolioId, fileName, contentType, size }) {
+exports.generatePresign = async ({ desarrollador_email, portfolioId, fileName, contentType, size }) => {
   if (!ALLOWED_CONTENT_TYPES.includes(contentType)) {
     throw { status: 400, message: 'Tipo de archivo no permitido' };
   }
@@ -69,7 +69,7 @@ export async function generatePresign({ desarrollador_email, portfolioId, fileNa
   }
 }
 
-export async function confirmUpload({ desarrollador_email, portfolioId, key, contentType, size }) {
+exports.confirmUpload = async ({ desarrollador_email, portfolioId, key, contentType, size }) => {
   // Vuelve a validar, del lado del server
   if (!ALLOWED_CONTENT_TYPES.includes(contentType)) {
     throw { status: 400, message: 'Tipo de archivo no permitido' };
