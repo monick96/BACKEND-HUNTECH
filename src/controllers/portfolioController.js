@@ -1,21 +1,28 @@
 
 const portfolioService = require("../services/portfolioService")
 
-exports.readContracts = async (req, res) => {
+exports.getPortfolioById = async (req, res) => {
   try {
-    (result = await contractService.getAllContracts()),
-
-      res.status(200);
+    let email = req.params.email;
+    (result = await portfolioService.getPortfolioById(email)),
+    res.status(200);
     res.json({
-      message: "contratos obtenidos correctamente",
-      count: result.length,
+      message: `portfolio obtenido correctamente`,
+      //count: result.length,
       data: result,
-
     });
+
   } catch (error) {
-    console.error("Error al obtener contratos: " + error);
+    console.error(
+      `Error al obtener portfolio para el desarrollador ${req.params.email} ` +
+      error
+    );
     res.status(500);
-    res.json({ error: "Error al obtener contratos: " + error.message });
+    res.json({
+      error:
+        `Error al obtener portfolio para el gerente ${req.params.email} ` +
+        error.message,
+    });
   }
 };
 
