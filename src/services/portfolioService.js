@@ -1,6 +1,6 @@
 const portfolioRepository = require("../repositories/portfolioRepository");
 const s3Service = require("./s3Service");
-const MAX_PORTFOLIOS_PER_DEV = 3;
+const MAX_PORTFOLIOS_POR_DESARROLLADOR = 1;
 const MAX_IMAGES_PER_PORTFOLIO = 3;
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 const ALLOWED_CONTENT_TYPES = ["image/jpeg", "image/png", "image/webp"];
@@ -17,28 +17,31 @@ exports.getPortfolioById = async (email) => {
   }
 };
 
-exports.createPortfolio = async ({
-  desarrollador_email,
-  titulo,
-  descripcion,
-}) => {
+exports.chequearSiExistePortfolioParaEseUsuario = async (email) => {
   try {
-    const count =
-      await portfolioRepository.countPortfoliosByDeveloper(desarrollador_email);
-    if (count >= MAX_PORTFOLIOS_PER_DEV) {
-      throw Error({ status: 400, message: "Máximo de portfolios alcanzado" });
+    if (!email) {
+      throw Error("Se debe indicar el email del usuario a buscar");
     }
-    const portfolio = await portfolioRepository.createPortfolio(
-      titulo,
-      descripcion,
-    );
-    await portfolioRepository.linkDeveloperToPortfolio({
-      desarrollador_email,
-      portfolio_id: portfolio.id,
-    });
-    return portfolio;
-  } catch (err) {
-    throw Error("Error al crear portfolio: " + err.message);
+    return await portfolioRepository.checkIfPorfolioCreated(email);
+  } catch (error) {
+    console.error("SERVICE - Error al chequear si existe portfolio para ese usuario: " + error);
+    throw Error("Error al chequear si existe portfolio para ese usuario: " + error.message);
+  }
+};
+
+
+exports.createPortfolio = async (desarrollador_email, portfolio) => {
+  /* console.log("asdf",desarrollador_email)
+  console.log("portfolio: " ,portfolio) */
+  try {
+    if (!desarrollador_email) {
+      throw Error("Se debe indicar el email del desarrollador");
+    }
+    
+    return await portfolioRepository.createPortfolio( desarrollador_email, portfolio );    
+  } catch (error) {
+    console.error("SERVICE - Error al crear portfolio: " + error);
+    throw Error("Error al crear portfolio: " + error.message);
   }
 };
 
@@ -72,7 +75,7 @@ exports.generatePresign = async ({
     // Chequeo de cantidad de imágenes
     const currentImages = p.imagenes || [];
     if (currentImages.length >= MAX_IMAGES_PER_PORTFOLIO) {
-      throw Error ({ status: 400, message: "Portfolio ya tiene 3 imágenes" });
+      throw Error({ status: 400, message: "Portfolio ya tiene 3 imágenes" });
     }
 
     // Genera la key y una URL prefirmada (presigned)
@@ -116,7 +119,7 @@ exports.confirmUpload = async ({
 
     // Bloqueo de row y checkeo de cantidad
     //ESTA PARTE HAY QUE MANDARLA AL REPOSITORIO, Y SACAR ESTO DE LLAMAR AL CLIENT (ELIMINÉ EL CLIENT DE TODAS ESTAS FUNCIONES LO DEJO ACÁ PARA RECORDAR)
-/*     const q = `SELECT imagenes FROM portfolio WHERE id=$1 FOR UPDATE`;
+    /*     const q = `SELECT imagenes FROM portfolio WHERE id=$1 FOR UPDATE`;
     const r = await client.query(q, [portfolioId]);
     if (r.rowCount === 0)
       throw Error ({ status: 404, message: "Portfolio no encontrado" });
@@ -132,7 +135,7 @@ exports.confirmUpload = async ({
       const s3ContentLength = Number(head.ContentLength || 0);
       const s3ContentType = head.ContentType;
       if (s3ContentLength !== Number(size)) {
-        throw Error ({ status: 400, message: "Tamaño en S3 no coincide" });
+        throw Error({ status: 400, message: "Tamaño en S3 no coincide" });
       }
       if (s3ContentType !== contentType) {
         throw Error({ status: 400, message: "Content-Type en S3 no coincide" });
@@ -150,7 +153,8 @@ exports.confirmUpload = async ({
 
     return { url, imagenes: updated };
   } catch (err) {
-    throw Error("Error al hacer append de la imagen al portfolio: " + err.message);
-
-  } 
+    throw Error(
+      "Error al hacer append de la imagen al portfolio: " + err.message,
+    );
+  }
 };

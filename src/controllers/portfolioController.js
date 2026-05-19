@@ -6,12 +6,20 @@ exports.getPortfolioById = async (req, res) => {
     let email = req.params.email;
     (result = await portfolioService.getPortfolioById(email)),
     res.status(200);
-    res.json({
+    if (result == undefined) {
+      res.json({
+      message: `El usuario no tiene portfolio creado`,
+      //count: result.length,
+      data: 0,
+    });  
+    } else {
+      res.json({
       message: `portfolio obtenido correctamente`,
       //count: result.length,
       data: result,
     });
-
+    }
+    
   } catch (error) {
     console.error(
       `Error al obtener portfolio para el desarrollador ${req.params.email} ` +
@@ -26,6 +34,38 @@ exports.getPortfolioById = async (req, res) => {
   }
 };
 
+exports.createPortfolio = async (req, res) => {
+    try {
+        let email = req.params.email
+        let portfolio = req.body;
+
+        const portfolioYaCreado = await portfolioService.chequearSiExistePortfolioParaEseUsuario(req.params.email);
+        if (portfolioYaCreado == 1) {
+            return res.status(400).json({ message: 'Ya existe un un repositorio para ese usuario' });
+        }
+
+        const { imagenes1, imagenes2, imagenes3 } = portfolio;
+        
+        if (imagenes1 && imagenes1.length > 3) {
+            return res.status(400).json({ error: 'Un proyecto de portfolio no puede tener más de 3 imagenes' });
+        }
+        if (imagenes2 && imagenes2.length > 3) {
+            return res.status(400).json({ error: 'Un proyecto de portfolio no puede tener más de 3 imagenes' });
+        }
+        if (imagenes3 && imagenes3.length > 3) {
+            return res.status(400).json({ error: 'Un proyecto de portfolio no puede tener más de 3 imagenes' });
+        }
+
+        result = await portfolioService.createPortfolio(email, portfolio)
+        res.status(201);
+        res.json ({ message: 'portfolio creado', email_portfolio: result })
+    } catch (error) {
+        console.error('Desde el controller: error al crear portfolio: ' + error);
+        res.status(500)
+        res.json({ error: 'Error al crear portfolio: ' + error.message });
+    }
+};
+
 exports.getPresignedUrls = async (req, res, next) => {
     try {
         const { files } = req.body; // Array of { fileName, fileType }
@@ -34,24 +74,6 @@ exports.getPresignedUrls = async (req, res, next) => {
         }
         const urls = await portfolioService.generateUploadUrls(files);
         return res.status(200).json(urls);
-    } catch (error) {
-        next(error);
-    }
-};
-
-exports.createPortfolio = async (req, res, next) => {
-    try {
-        const { email, titulo, descripcion, imagenes } = req.body;
-        
-        if (!email || !titulo) {
-            return res.status(400).json({ error: 'Email and Title are required' });
-        }
-        if (imagenes && imagenes.length > 3) {
-            return res.status(400).json({ error: 'A portfolio cannot exceed 3 images' });
-        }
-
-        const newPortfolio = await portfolioService.savePortfolioWithDeveloper(email, { titulo, descripcion, imagenes });
-        return res.status(201).json(newPortfolio);
     } catch (error) {
         next(error);
     }
