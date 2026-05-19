@@ -104,7 +104,7 @@ app.use('/api', routerUsuario)
 app.use('/api', routerWhitelistEmail);
 
 //la api para crear portfolios y subirles imágenes
-app.use('/api/portfolios', routerPortfolio);
+app.use('/api', routerPortfolio);
 
 
 //inicia server y escucha solicitudes
