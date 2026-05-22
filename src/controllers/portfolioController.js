@@ -66,6 +66,22 @@ exports.createPortfolio = async (req, res) => {
     }
 };
 
+exports.deletePortfolio = async (req, res) => {
+    try {
+        let email = req.params.email
+        result = await portfolioService.deletePortfolio(email)
+        res.status(200);
+        res.json({ message: 'portfolio eliminado', desarrollador_email: result });
+
+    } catch (error) {
+        console.error('Error al eliminar portfolio: ' + error);
+        res.status(500)
+        res.json({ error: 'Error al elimninar portfolio: ' + error.message });
+    }
+}
+
+
+/* ################################# de acá en más no está en uso  ################################# */
 exports.getPresignedUrls = async (req, res, next) => {
     try {
         const { files } = req.body; // Array of { fileName, fileType }

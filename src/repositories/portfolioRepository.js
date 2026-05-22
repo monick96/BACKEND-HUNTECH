@@ -19,20 +19,17 @@ exports.checkIfPorfolioCreated = async (email) => {
     const result = await pool.query(query, values);
 
     return result.rows[0].existe;
-
   } catch (error) {
-    
     console.error(
       "REPOSITORY - Error al chequear si existe portfolio para ese usuario: " +
-      error
+        error,
     );
 
     throw Error(error.message);
   }
-}
+};
 
-
- // para imagenes: 
+// para imagenes:
 
 //titulo1, titulo2, titulo3, descripcion1... imagenes1... cada "imagenes" es un array de hasta 3 strings.
 exports.createPortfolio = async (email, portfolio) => {
@@ -49,7 +46,7 @@ exports.createPortfolio = async (email, portfolio) => {
             FROM nuevo_portfolio
             )
             select * from nuevo_portfolio;`;
-            
+
   const values = [
     portfolio.titulo1 || "",
     portfolio.titulo2 || "",
@@ -69,11 +66,28 @@ exports.createPortfolio = async (email, portfolio) => {
     portfolio.repositorio1 || "",
     portfolio.repositorio2 || "",
     portfolio.repositorio3 || "",
-    email
+    email,
   ];
 
   const r = await pool.query(q, values);
-  return email
+  return email;
+};
+
+exports.removePortfolio = async (email) => {
+  const q = `DELETE FROM
+             portfolio p 
+             WHERE p.id IN (
+              SELECT portfolio_id
+              FROM desarrollador_x_portfolio d
+              WHERE d.desarrollador_email= $1
+             );`;
+  const values = [email];
+  const r = await pool.query(q, values);
+  const q2 = `DELETE FROM desarrollador_x_portfolio d
+            WHERE d.desarrollador_email = $1;`;
+  const r2 = await pool.query(q2, values);
+
+  return email;
 };
 
 //y de acá en más asumo que todo hay que reescribirlo.

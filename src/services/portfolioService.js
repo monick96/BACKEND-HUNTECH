@@ -45,6 +45,20 @@ exports.createPortfolio = async (desarrollador_email, portfolio) => {
   }
 };
 
+exports.deletePortfolio = async (email) => {
+  try {
+    if (!email) {
+      throw Error("Se debe indicar el email del dueño del portfolio");
+    }
+    return await portfolioRepository.removePortfolio(email);
+  } catch (error) {
+    console.error("SERVICE - Error al eliminar portfolio: " + error);
+    throw Error("Error al eliminar portfolio: " + error.message);
+  }
+};
+
+/* ################################# sin uso actual ################################# */
+
 exports.generatePresign = async ({
   desarrollador_email,
   portfolioId,
