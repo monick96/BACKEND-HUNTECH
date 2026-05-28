@@ -123,3 +123,148 @@ exports.removeImageFromPortfolio = async (portfolioId, imageUrl) => {
   const r = await pool.query(q, [portfolioId, imageUrl]);
   return r.rows[0]?.imagenes;
 };
+
+exports.updatePortfolioByEmailRepository = async (email, portfolio) => {
+  try {
+    let setClauses = [];
+    let values = [];
+    let paramIndex = 1;
+
+    const {
+      titulo1,
+      titulo2,
+      titulo3,
+      descripcion1,
+      descripcion2,
+      descripcion3,
+      imagenes1,
+      imagenes2,
+      imagenes3,
+      repositorio1,
+      repositorio2,
+      repositorio3,
+    } = portfolio;
+
+    if (titulo1 != null) {
+      setClauses.push(`titulo1 = $${paramIndex}`);
+
+      values.push(titulo1);
+
+      paramIndex++;
+    }
+
+    if (titulo2 != null) {
+      setClauses.push(`titulo2 = $${paramIndex}`);
+
+      values.push(titulo2);
+
+      paramIndex++;
+    }
+
+    if (titulo3 != null) {
+      setClauses.push(`titulo3 = $${paramIndex}`);
+
+      values.push(titulo3);
+
+      paramIndex++;
+    }
+
+    if (descripcion1 != null) {
+      setClauses.push(`descripcion1 = $${paramIndex}`);
+
+      values.push(descripcion1);
+
+      paramIndex++;
+    }
+
+    if (descripcion2 != null) {
+      setClauses.push(`descripcion2 = $${paramIndex}`);
+
+      values.push(descripcion2);
+
+      paramIndex++;
+    }
+
+    if (descripcion3 != null) {
+      setClauses.push(`descripcion3 = $${paramIndex}`);
+
+      values.push(descripcion3);
+
+      paramIndex++;
+    }
+
+    if (imagenes1 != null) {
+      setClauses.push(`imagenes1 = $${paramIndex}`);
+
+      values.push(imagenes1);
+
+      paramIndex++;
+    }
+
+    if (imagenes2 != null) {
+      setClauses.push(`imagenes2 = $${paramIndex}`);
+
+      values.push(imagenes2);
+
+      paramIndex++;
+    }
+
+    if (imagenes3 != null) {
+      setClauses.push(`imagenes3 = $${paramIndex}`);
+
+      values.push(imagenes3);
+
+      paramIndex++;
+    }
+
+    if (repositorio1 != null) {
+      setClauses.push(`repositorio1 = $${paramIndex}`);
+
+      values.push(repositorio1);
+
+      paramIndex++;
+    }
+
+    if (repositorio2 != null) {
+      setClauses.push(`repositorio2 = $${paramIndex}`);
+
+      values.push(repositorio2);
+
+      paramIndex++;
+    }
+
+    if (repositorio3 != null) {
+      setClauses.push(`repositorio3 = $${paramIndex}`);
+
+      values.push(repositorio3);
+
+      paramIndex++;
+    }
+
+    if (setClauses.length === 0) return null;
+
+    values.push(email);
+
+    const query = `
+        UPDATE 
+          portfolio p
+        SET 
+          ${setClauses.join(", ")} 
+        WHERE p.id IN
+          (SELECT portfolio_id
+           FROM desarrollador_x_portfolio d
+           WHERE d.desarrollador_email= $${paramIndex} )
+    
+        RETURNING *;
+      `;
+
+    const result = await pool.query(query, values);
+
+    return result.rows[0];
+  } catch (error) {
+    console.error(
+      "REPOSITORY - Error al actualizar portfolio: " + error.message,
+    );
+    throw Error("Error al actualizar portfolio: " + error.message);
+  }
+};
