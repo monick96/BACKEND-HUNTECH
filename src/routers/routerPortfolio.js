@@ -12,6 +12,10 @@ routerPortfolio.post('/createportfolio/:email', portfolioController.createPortfo
 // Ruta para eliminar portfolio
 routerPortfolio.delete('/deleteportfolio/:email', portfolioController.deletePortfolio)
 
+// Ruta para editar portfolio
+routerPortfolio.put('/updateportfolio/:email', portfolioController.updatePortfolioByEmail)
+
+
 
 // Ruta para conseguir tokens de subida segura AUN NO IMPLEMENTADO
 /* router.post('/presigned-urls', portfolioController.getPresignedUrls); */

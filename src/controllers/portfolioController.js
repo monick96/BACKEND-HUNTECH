@@ -80,6 +80,23 @@ exports.deletePortfolio = async (req, res) => {
     }
 }
 
+exports.updatePortfolioByEmail = async (req, res) => {
+    try {
+        let { email } = req.params;
+        let portfolio = req.body;
+
+        let result = await portfolioService.updatePortfolioByEmail(email, portfolio);
+
+        res.status(200);
+        res.json({ message: 'portfolio actualizado', data: result });
+
+    }
+    catch (error) {
+        console.error('Error al actualizar portfolio: ' + error);
+        res.status(500)
+        res.json({ error: 'Error al actualizar portfolio: ' + error.message });
+    }
+}
 
 /* ################################# de acá en más no está en uso  ################################# */
 exports.getPresignedUrls = async (req, res, next) => {
