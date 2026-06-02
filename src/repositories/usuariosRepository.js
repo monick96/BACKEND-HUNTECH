@@ -99,16 +99,18 @@ exports.getUserByEmailRepository = async (email, tabla) => {
     }
 
     // Concurrencia:
-    // Dos consultas en paralelo.
+    // Tres consultas en paralelo.
     // Si el user es desarrollador:
-    const [resultadosIdiomas, resultadosHabilidades] = await Promise.all([
+    const [resultadosIdiomas, resultadosHabilidades, resultadoVerificado] = await Promise.all([
       pool.query("SELECT nombre_idioma, nivel_idioma FROM idioma_x_desarrollador WHERE email_desarrollador = $1", [email]),
-      pool.query("SELECT nombre_habilidad, nivel_habilidad FROM habilidad_x_desarrollador WHERE email_desarrollador = $1", [email])
+      pool.query("SELECT nombre_habilidad, nivel_habilidad FROM habilidad_x_desarrollador WHERE email_desarrollador = $1", [email]),
+      pool.query("SELECT 1 FROM whitelist_email WHERE email = $1 AND estado = 'activo' LIMIT 1", [email]),
     ]);
 
     // asocio al usuario los resultados , para que lo maneje el front
     usuarioBase.idiomas = resultadosIdiomas.rows;
     usuarioBase.habilidades = resultadosHabilidades.rows;
+    usuarioBase.verificado = resultadoVerificado.rows.length > 0;
 
     return usuarioBase;
 
@@ -612,9 +614,12 @@ exports.getAllDesarrolladoresRepository = async () => {
 
     const query =`
       SELECT
-          *
+          d.*,
+          CASE WHEN w.email IS NOT NULL THEN true ELSE false END AS verificado
       FROM
-          desarrollador
+          desarrollador d
+      LEFT JOIN whitelist_email w
+          ON d.email = w.email AND w.estado = 'activo'
     `;
 
     const result = await pool.query(query);
