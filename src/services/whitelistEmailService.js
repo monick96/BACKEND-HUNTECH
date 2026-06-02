@@ -156,3 +156,35 @@ exports.listarEmailsService = async ({ estado, tipo_usuario, q, lote_id, page = 
         data: rows,
     };
 };
+
+/**
+ * Verifica si un email está en la whitelist con estado activo.
+ */
+exports.verificarEmailService = async (email) => {
+    const emailNorm = normalizarEmail(email);
+    if (!emailNorm) throw new Error('El campo email es obligatorio');
+    if (!EMAIL_REGEX.test(emailNorm)) throw new Error(`Email con formato inválido: ${emailNorm}`);
+
+    return await whitelistEmailRepository.verificarEmailRepository(emailNorm);
+};
+
+/**
+ * Verifica múltiples emails contra la whitelist (batch).
+ * Recibe un array de strings y retorna un array con el estado de cada uno.
+ */
+exports.verificarEmailsBatchService = async (emails) => {
+    if (!Array.isArray(emails) || emails.length === 0) {
+        throw new Error('Se debe enviar un array de emails no vacío');
+    }
+    if (emails.length > 200) {
+        throw new Error('Se permite un máximo de 200 emails por consulta');
+    }
+
+    const normalizados = emails.map(e => normalizarEmail(e));
+    const invalidos = normalizados.filter(e => !EMAIL_REGEX.test(e));
+    if (invalidos.length) {
+        throw new Error(`Emails con formato inválido: ${invalidos.join(', ')}`);
+    }
+
+    return await whitelistEmailRepository.verificarEmailsBatchRepository(normalizados);
+};

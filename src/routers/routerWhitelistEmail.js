@@ -117,4 +117,57 @@ routerWhitelistEmail.post('/whitelist-email/upload', upload.single('file'), whit
  */
 routerWhitelistEmail.get('/whitelist-email', whitelistEmailController.listEmails);
 
+/**
+ * @swagger
+ * /api/whitelist-email/verificar/{email}:
+ *   get:
+ *     summary: Verifica si un email está en la whitelist (verificado)
+ *     tags: [WhitelistEmail]
+ *     parameters:
+ *       - in: path
+ *         name: email
+ *         required: true
+ *         description: Email a verificar
+ *         schema:
+ *           type: string
+ *           example: dev@ejemplo.com
+ *     responses:
+ *       200:
+ *         description: Estado de verificación del email
+ *       400:
+ *         description: Email inválido
+ */
+routerWhitelistEmail.get('/whitelist-email/verificar/:email', whitelistEmailController.verificarEmail);
+
+/**
+ * @swagger
+ * /api/whitelist-email/verificar-batch:
+ *   post:
+ *     summary: Verifica múltiples emails contra la whitelist (batch)
+ *     description: |
+ *       Recibe un array de emails y retorna cuáles están verificados.
+ *       Ideal para el panel del gerente que necesita mostrar el check
+ *       de verificado en la lista de postulantes.
+ *     tags: [WhitelistEmail]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [emails]
+ *             properties:
+ *               emails:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 example: ["dev1@mail.com", "dev2@mail.com"]
+ *     responses:
+ *       200:
+ *         description: Resultado de verificación por email
+ *       400:
+ *         description: Datos inválidos
+ */
+routerWhitelistEmail.post('/whitelist-email/verificar-batch', whitelistEmailController.verificarEmailsBatch);
+
 module.exports = routerWhitelistEmail;
