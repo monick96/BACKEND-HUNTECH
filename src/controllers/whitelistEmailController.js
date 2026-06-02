@@ -116,3 +116,50 @@ exports.listEmails = async (req, res) => {
         res.status(400).json({ error: error.message });
     }
 };
+
+/**
+ * GET /api/whitelist-email/verificar/:email
+ * Verifica si un email está en la whitelist (estado activo).
+ * Responde con { verificado: true/false, tipo_usuario }.
+ */
+exports.verificarEmail = async (req, res) => {
+    try {
+        const { email } = req.params;
+        const result = await whitelistEmailService.verificarEmailService(email);
+
+        res.status(200).json({
+            message: result.verificado
+                ? 'El email está verificado en la whitelist'
+                : 'El email no se encuentra en la whitelist',
+            data: result,
+        });
+    } catch (error) {
+        console.error('Error al verificar email en whitelist: ' + error);
+        res.status(400).json({ error: error.message });
+    }
+};
+
+/**
+ * POST /api/whitelist-email/verificar-batch
+ * Verifica múltiples emails contra la whitelist.
+ * Body: { emails: ["email1@x.com", "email2@y.com"] }
+ * Responde con un array de { email, verificado, tipo_usuario }.
+ */
+exports.verificarEmailsBatch = async (req, res) => {
+    try {
+        const { emails } = req.body;
+        const result = await whitelistEmailService.verificarEmailsBatchService(emails);
+
+        const verificados = result.filter(r => r.verificado).length;
+
+        res.status(200).json({
+            message: `Verificación completada. ${verificados} de ${result.length} emails están en la whitelist`,
+            total: result.length,
+            verificados_count: verificados,
+            data: result,
+        });
+    } catch (error) {
+        console.error('Error al verificar emails en batch: ' + error);
+        res.status(400).json({ error: error.message });
+    }
+};

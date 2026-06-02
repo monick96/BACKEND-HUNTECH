@@ -76,6 +76,47 @@ exports.bulkUpsertEmailsRepository = async (registros, { cargado_por, lote_id })
 };
 
 /**
+ * Verifica si un email existe en la whitelist con estado 'activo'.
+ * Retorna { verificado: true/false, tipo_usuario } o { verificado: false }.
+ */
+exports.verificarEmailRepository = async (email) => {
+    const query = `
+        SELECT id, email, tipo_usuario, estado
+        FROM whitelist_email
+        WHERE email = $1 AND estado = 'activo'
+        LIMIT 1;
+    `;
+    const result = await pool.query(query, [email]);
+    if (result.rows.length > 0) {
+        return { verificado: true, tipo_usuario: result.rows[0].tipo_usuario };
+    }
+    return { verificado: false };
+};
+
+/**
+ * Verifica múltiples emails contra la whitelist (batch).
+ * Retorna un array de { email, verificado, tipo_usuario }.
+ */
+exports.verificarEmailsBatchRepository = async (emails) => {
+    if (!emails || emails.length === 0) return [];
+
+    const query = `
+        SELECT email, tipo_usuario
+        FROM whitelist_email
+        WHERE email = ANY($1) AND estado = 'activo';
+    `;
+    const result = await pool.query(query, [emails]);
+
+    const whitelistMap = new Map(result.rows.map(r => [r.email, r.tipo_usuario]));
+
+    return emails.map(email => ({
+        email,
+        verificado: whitelistMap.has(email),
+        tipo_usuario: whitelistMap.get(email) || null,
+    }));
+};
+
+/**
  * Listado paginado con filtros opcionales.
  */
 exports.listEmailsRepository = async ({ estado, tipo_usuario, q, lote_id, limit = 50, offset = 0 }) => {
